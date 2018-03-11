@@ -1,0 +1,60 @@
+<?php
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+?>
+<?php $defaultInformation = $this->helper('Magestore\OneStepCheckout\Helper\Config')->getDefaultAddressInformation();?>
+<script type='text/javascript'>
+    require([
+        'Magestore_OneStepCheckout/js/model/addressFieldManager'
+    ], function(addressFieldManager) {
+        addressFieldManager.init(<?php echo $this->helper('Magestore\OneStepCheckout\Helper\Config')->getAddressFieldsJsonConfig();?>);
+    })
+</script>
+<ol class="one-step-checkout onestepcheckout-index-index three-columns-new-osc clearfix">
+    <li id="checkout" data-bind="scope:'checkout'" class="checkout-container">
+        <div id="checkout-loader" data-role="checkout-loader" class="loading-mask show" data-mage-init='{"checkoutLoader": {}}'>
+            <div class="loader">
+                <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>"
+                     alt="<?php /* @escapeNotVerified */ echo __('Loading...'); ?>"
+                     style="position: absolute;">
+            </div>
+        </div>
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+            {
+                "#checkout": {
+                    "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+                }
+            }
+        </script>
+        <script>
+            window.checkoutConfig = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getCheckoutConfig()); ?>;
+            window.giftOptionsConfig = <?php echo $block->getLayout()->createBlock('Magento\GiftMessage\Block\Cart\GiftOptions')->getGiftOptionsConfigJson(); ?>;
+            // Create aliases for customer.js model from customer module
+            window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+            window.customerData = window.checkoutConfig.customerData;
+
+            window.checkoutConfig.defaultCountryId = '<?php /* @escapeNotVerified */ echo $defaultInformation['country_id']; ?>';
+            window.checkoutConfig.defaultPostcode = '<?php /* @escapeNotVerified */ echo $defaultInformation['postcode']; ?>';
+            window.checkoutConfig.defaultRegionId = '<?php /* @escapeNotVerified */ echo $defaultInformation['region_id']; ?>';
+            window.checkoutConfig.defaultCity = '<?php /* @escapeNotVerified */ echo $defaultInformation['city']; ?>';
+        </script>
+
+        <script>
+            require([
+                'mage/url',
+                'Magento_Ui/js/block-loader'
+            ], function(url, blockLoader) {
+                blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+                return url.setBaseUrl('<?php /* @escapeNotVerified */ echo $block->getBaseUrl();?>');
+            })
+        </script>
+
+    </li>
+</ol>

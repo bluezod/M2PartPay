@@ -1,0 +1,31 @@
+
+<style>
+    #geoip-guide {
+        cursor: pointer;
+    }
+</style>
+<?php if (!$block->isHasLibrary() && !$block->isHasGeoIpDataFile()) :?>
+<div class="message message-warning error">
+    <?php echo __('Your Geo Ip is not installed! If you want to use Geo IP feature, please follow'); ?>
+        <a id="geoip-guide"><?php echo __('this guide');?></a>.
+</div>
+<?php endif;?>
+<script>
+    require(
+        [
+            'jquery'
+        ], function ($) {
+       $('#geoip-guide').click(function () {
+           var geoIpContent = $('#geoip-content');
+           var geoIpHeader = $('#onestepcheckout_geoip_management-head');
+
+           if (!geoIpContent.is(":visible")) {
+               geoIpHeader.click();
+           }
+
+           $('html,body').animate({
+               scrollTop: geoIpHeader.offset().top
+           }, 1000);
+       });
+    });
+</script>

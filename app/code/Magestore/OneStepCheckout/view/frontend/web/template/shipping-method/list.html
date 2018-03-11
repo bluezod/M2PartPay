@@ -1,0 +1,99 @@
+
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!--Shipping method template-->
+<li id="opc-shipping_method"
+    class="checkout-shipping-method"
+    data-bind="fadeVisible: visible()"
+    role="presentation">
+    <div class="checkout-shipping-method">
+        <h3 class="step-title step_2" id="shipping_method_step_header" data-bind="i18n: 'Shipping Methods'" data-role="title"></h3>
+        <!-- ko foreach: getRegion('before-shipping-method-form') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+        <div id="checkout-step-shipping_method"
+             class="step-content onestepcheckout-shipping-method-section"
+             data-role="content"
+             role="tabpanel"
+             aria-hidden="false">
+            <!-- ko if: rates().length  -->
+            <form class="form methods-shipping" id="co-shipping-method-form" data-bind="submit: setShippingInformation" novalidate="novalidate">
+                <div id="checkout-shipping-method-load">
+                    <dl class="sp-methods">
+                        <!--ko foreach: { data: getShippingList(), as: 'carrier'}-->
+                        <dt data-bind="text: carrier.title, attr: {'id': 'label_carrier_' + carrier.code + '_' + carrier.code}"></dt>
+                        <dd>
+                            <ul>
+                                <!--ko foreach: { data: carrier.methods, as: 'method'}-->
+                                <li class="radioparent" data-bind="click: $parents[1].selectShippingMethod.bind($parents[1])">
+                                    <!-- ko if:  method.error_message -->
+                                    <ul class="messages">
+                                        <li class="error-msg">
+                                            <ul>
+                                                <li data-bind="text: method.error_message"></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <!-- /ko -->
+                                    
+                                    <!-- ko ifnot: method.error_message -->
+                                    <!-- ko if: carrier.methods.length == 1 && $parents[1].getShippingList().length == 1 -->
+                                    <input class="radio"
+                                           type="radio"
+                                           data-bind="attr: {
+                                                        checked: carrier.methods.length == 1,
+                                                        'value' : method.carrier_code + '_' + method.method_code,
+                                                        'id': 's_method_' + method.method_code,
+                                                        'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
+                                                     }" />
+                                    <!-- /ko -->
+                                    <!--ko ifnot: (carrier.methods.length == 1 && $parents[1].getShippingList().length == 1)-->
+                                    <input type="radio"
+                                           data-bind="
+                                                    value: method.carrier_code + '_' + method.method_code,
+                                                    checked: $parents[1].isSelected,
+                                                    attr: {
+                                                        'id': 's_method_' + method.carrier_code + '_' + method.method_code,
+                                                        'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
+                                                    }"
+                                           class="radio"/>
+                                    <!--/ko-->
+                                    <label data-bind="attr: {'id': 's_method_' + method.carrier_code + '_' + method.method_code}">
+                                        <span data-bind="text:method.method_title"></span>
+                                        <span class="col-price" data-bind="text: $parents[1].formatPrice(method.amount)"></span>
+                                        <!-- ko foreach: $parents[1].getRegion('price') -->
+                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                        <!-- /ko -->
+                                    </label>
+                                    <!-- /ko -->
+                                </li>
+                            <!-- /ko -->
+                                
+                            </ul>
+                        </dd>
+                        <!-- /ko -->
+                    </dl>
+                </div>
+
+                <div id="onepage-checkout-shipping-method-additional-load">
+                    <!-- ko foreach: getRegion('shippingAdditional') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!-- /ko -->
+                </div>
+                <!-- ko if: errorValidationMessage().length > 0 -->
+                <div class='clear'></div>
+                <div class="message notice">
+                    <span><!-- ko text: errorValidationMessage()--><!-- /ko --></span>
+                </div>
+                <!-- /ko -->
+            </form>
+            <!-- /ko -->
+            <!-- ko ifnot: rates().length > 0 --><div class="no-quotes-block"><!-- ko i18n: 'Sorry, no quotes are available for this order at this time'--><!-- /ko --></div><!-- /ko -->
+        </div>
+    </div>
+</li>

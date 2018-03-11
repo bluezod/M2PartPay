@@ -1,0 +1,57 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko if: isActive() -->
+<div class="gift-message" id="gift-message-form" style="display: none">
+    <div class="gift-options-content onestepcheckout-form-list">
+        <fieldset class="fieldset">
+            <div class="field field-to">
+                <div class="control">
+                    <input type="text"
+                           id="gift-message-whole-to"
+                           class="input-text"
+                           data-bind="value: getObservable('recipient')" required>
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label for="gift-message-whole-to" class="label">
+                        <span data-bind="i18n: 'To:'"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="field field-from">
+                <div class="control">
+                    <input type="text"
+                           id="gift-message-whole-from"
+                           class="input-text"
+                           data-bind="value: getObservable('sender')" required>
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label for="gift-message-whole-from" class="label">
+                        <span data-bind="i18n: 'From:'"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="field text" id="gift-message-field">
+                
+                <div class="control">
+                    <textarea id="gift-message-whole-message"
+                              class="input-text"
+                              rows="5" cols="10"
+                              data-bind="value: getObservable('message')" required placeholder="Message"></textarea>
+                   <!-- <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label for="gift-message-whole-message" class="label">
+                        <span data-bind="i18n: 'Message:'"></span>
+                    </label>-->
+                </div>
+            </div>
+        </fieldset>
+
+    </div>
+</div>
+<!-- /ko -->

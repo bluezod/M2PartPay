@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magestore\OneStepCheckout\Block\Adminhtml\Widget\System\Config\Position $block */
+$scopeId = $block->getScopeId();
+$scope = $block->getScope();
+$defaultLabel = __('Use Default');
+$defaultTitle = __('-- Please Select --');
+$scopeLabel = __('STORE VIEW');
+?>
+<div class="user_guide">
+    <?php echo __('Configure positions of fields in Billing and Shipping Address section. You can display fields into 2 columns (eg: First name + Last name) or 1 full column (eg: Address + Null)');?>
+</div>
+<?php for ($index = 0; $index < 20; $index++): ?>
+    <?php if ($index % 2 == 0): ?>
+        <tr>
+    <?php endif; ?>
+
+    <?php $data = $block->getFieldEnableBackEnd($index, $scope, $scopeId); ?>
+    <?php $active = ($scope == 'default' || !empty($data)); ?>
+    <td class="value">
+        <label for="<?php echo $block->getElementHtmlId($index);?>">
+            <select data-current-value="" style="width: 280px;margin-left:30px;"
+                    onfocus="forcus(this);"
+                    onchange="checkfield(this);"
+                    id="<?php echo $block->getElementHtmlId($index) ?>"
+                    name="<?php echo $block->getElementHtmlName($index) ?>"
+                <?php echo $active ? '' : 'disabled=""' ?>
+                    class="select"
+            >
+                <?php foreach ($block->getFieldOptions() as $value => $label): ?>
+                    <?php $selected = $data ? $data : $block->getDefaultField($index, $scope, $scopeId); ?>
+                    <option
+                        value="<?php echo $value ?>" <?php echo ($selected == $value) ? 'selected="selected"' : '' ?>>
+                        <?php echo $label ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+    </td>
+    <?php if ($scope != 'default'): ?>
+        <td class="use-default">
+            <input type="checkbox" value="1" class="checkbox config-inherit"
+                   id="<?php echo $block->getCheckBoxElementHtmlId($index) ?>"
+                   name="<?php echo $block->getCheckBoxElementHtmlName($index) ?>"
+                <?php echo $data ? '' : 'checked="checked"' ?>
+                   onclick="toggleValueElements(this, Element.previous(this.parentNode))"
+            />
+            <label for="<?php echo $block->getCheckBoxElementHtmlId($index) ?>"
+                   class="inherit"
+                   title="<?php echo $defaultTitle ?>">
+                <?php echo $defaultLabel ?>
+            </label>
+        </td>
+    <?php else: ?>
+        <td class="scope-label">[<?php echo $scopeLabel ?>]</td>
+    <?php endif; ?>
+    <?php if ($index % 2 != 0 || $index == 19): ?>
+        </tr>
+    <?php endif; ?>
+<?php endfor; ?>
+<style type="text/css">
+    #onestepcheckout_field_position_management_position {
+        display: none;
+    }
+
+    #onestepcheckout_field_position_management .collapseable {
+        display: none;
+    }
+
+    .user_guide {
+        background: none repeat scroll 0 0 #EAF0EE;
+        border: 1px dotted #FF0000;
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    #onestepcheckout_field_position_management .value {
+        width: 20% !important;
+    }
+</style>
+<script type="text/javascript">
+    var previous;
+    function forcus(field) {
+        previous = field.value;
+    }
+    function checkfield(field) {
+        require(["jquery"], function ($) {
+            $('[id^=onestepcheckout_field_position_management_row_]').each(function (index, element) {
+                if(($(element).val() == $(field).val())
+                    && ($(element).prop('id') != $(field).prop('id'))
+                    &&($(field).val() != '0')
+                ) {
+                    $(field).val(previous);
+                    alert("Field name already exists!");
+                    return true;
+                }
+            });
+        });
+    }
+</script>

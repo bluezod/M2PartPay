@@ -1,0 +1,19 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko if: isGiftWrap() -->
+<div class="onestepcheckout-giftwrap checkbox-group">
+    <input class="onestepcheckout_giftwrap_checkbox checkbox osc-additional-data" type="checkbox"
+           name="onestepcheckout_giftwrap_checkbox" id="onestepcheckout_giftwrap_checkbox"
+           data-bind="event: {click : addGiftWrap}, checked: isChecked" />
+    <label class="label--checkbox" for="onestepcheckout_giftwrap_checkbox"><!-- ko text: $t('Gift wrap') --><!-- /ko -->
+        <span class="check"></span>
+        <span class="box-check"></span>
+        <strong><span class="price" data-bind="text: giftWrapAmountPrice()"></span></strong>
+    </label>
+</div>
+<!-- /ko -->

@@ -1,0 +1,33 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<div class="wrap-payment-content">
+<div class="billing-address-same-as-shipping-block field choice checkbox-group" data-bind="visible: canUseShippingAddress()">
+    <input class='' type="checkbox" name="billing-address-same-as-shipping"
+           data-bind="checked: addressSameAsShipping, event:{change:checkUseShippingAddress},
+            attr: {id: 'billing-address-same-as-shipping-' + $parent.getCode(), disabled: canNotUseBillingDifferent}"/>
+    <label class="" data-bind="attr: {for: 'billing-address-same-as-shipping-' + $parent.getCode()}">
+        <span class="check"></span>
+        <span class="box-check"></span>
+        <span class='title' data-bind="i18n: 'My billing and shipping address are the same'"></span>
+    </label>
+</div>
+<!--ko if:(!addressSameAsShipping() || isVirtual())-->
+<!-- ko template: 'Magestore_OneStepCheckout/billing-address/details' --><!-- /ko -->
+<fieldset class="fieldset" data-bind="visible: !isAddressDetailsVisible()">
+    <!-- ko template: 'Magento_Checkout/billing-address/list' --><!-- /ko -->
+    <!-- ko template: 'Magestore_OneStepCheckout/billing-address/form' --><!-- /ko -->
+    <div class="actions">
+        <button class="action action-cancel osc-edit-button" type="button" data-bind="click: cancelAddressEdit">
+            <span data-bind="i18n: 'Cancel'"></span>
+        </button>
+        <button class="action action-update osc-ok-button update-address-button" type="button" data-bind="click: updateAddress">
+            <span data-bind="i18n: 'Update'"></span>
+        </button>
+    </div>
+</fieldset>
+<!-- /ko -->
+</div>

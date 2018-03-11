@@ -1,0 +1,49 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+
+<!-- ko if: isShowDiscount() -->
+<div class="onestepcheckout-discount">
+    <!-- ko foreach: getRegion('messages') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+    <form class="discount-form" id="discount-form">
+        <div class="input-box">
+            <!--<input class="input-text" id="coupon_code_onestepcheckout" autocomplete="off" name="coupon_code" value="">-->
+            <input class="input-text"
+                   type="text"
+                   id="discount-code"
+                   name="coupon_code"
+                   autocomplete="off"
+                   data-validate="{'required-entry':true}"
+                   data-bind="value: couponCode" required />
+            <span class="highlight"></span>
+            <span class="bar"></span>
+
+            <div for="discount-code" generated="true" class="mage-error" id="discount-code-error"></div>
+
+            <label for="discount-code"><span><!-- ko i18n: 'Enter coupon code here'--><!-- /ko --></span></label>
+        </div>
+        <div class="actions-button">
+            <!-- ko ifnot: isApplied() -->
+            <button id="add_coupon_code_button" class="action action-apply apply-coupon" type="submit" data-bind="'value': $t('Apply Discount'), click: apply">
+                <span><!-- ko i18n: 'Apply'--><!-- /ko --></span>
+            </button>
+            <!-- /ko -->
+            <!-- ko if: isApplied() -->
+            <button id="remove_coupon_code_button" class="action action-cancel apply-coupon" type="submit" data-bind="'value': $t('Cancel'), click: cancel">
+                <span><!-- ko i18n: 'Cancel'--><!-- /ko --></span>
+            </button>
+            <!-- /ko -->
+        </div>
+    </form>
+</div>
+<!-- /ko -->
+
+
+
+

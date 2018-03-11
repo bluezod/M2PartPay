@@ -1,0 +1,57 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<li id="shipping" class="checkout-shipping-address shipping_address" data-bind="fadeVisible: visible()">
+    <h3 class="step-title step_1" id="shipping_step_header" data-bind="i18n: 'Shipping Address'" data-role="title"></h3>
+    <div class="clear"></div>
+    <div id="checkout-step-shipping"
+         class="step-content"
+         data-role="content">
+
+        <!-- ko if: (!quoteIsVirtual) -->
+        <!-- ko foreach: getRegion('customer-email') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <!--/ko-->
+
+        <!-- ko foreach: getRegion('address-list') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <!-- ko foreach: getRegion('address-list-additional-addresses') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <!-- Address form pop up -->
+        <!-- ko if: (!isFormInline) -->
+        <button type="button"
+                data-bind="click: showFormAddress, visible: !isNewAddressAdded() && !isFormPopUpVisible()"
+                class="action action-add-new-address osc-ok-button">
+            <span data-bind="i18n: 'New Address'"></span></button>
+        <div id="opc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
+            <!-- ko template: 'Magestore_OneStepCheckout/shipping-address/form' --><!-- /ko -->
+            <div class='clear'></div>
+            <div class='actions'>
+                <button class="action action-save-address osc-ok-button" type="button" data-bind="click:saveNewAddress">
+                    <span data-bind="i18n:'Save'"></span>
+                </button>
+                <button class="action action-hide-popup osc-edit-button" type="button" data-bind="click:hideAddressForm">
+                    <span data-bind="i18n:'Cancel'"></span>
+                </button>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko foreach: getRegion('before-form') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <!-- Inline address form -->
+        <!-- ko if: (isFormInline) -->
+        <!-- ko template: 'Magestore_OneStepCheckout/shipping-address/form' --><!-- /ko -->
+        <!-- /ko -->
+    </div>
+</li>

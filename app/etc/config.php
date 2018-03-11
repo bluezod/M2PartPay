@@ -137,6 +137,7 @@ return array (
     'Dotdigitalgroup_Email' => 1,
     'Magento_WishlistAnalytics' => 1,
     'Magento_WishlistSampleData' => 1,
+    'Magestore_OneStepCheckout' => 1,
     'Shopial_Facebook' => 1,
     'Temando_Shipping' => 1,
   ),

@@ -1,0 +1,253 @@
+<?php
+
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+$minimumPasswordLength = $this->helper('Magestore\OneStepCheckout\Helper\Config')->getMinimumPasswordLength();
+$requiredCharacterClassesNumber = $this->helper('Magestore\OneStepCheckout\Helper\Config')->getRequiredCharacterClassesNumber();
+$canShowPasswordMeterValidate = $this->helper('Magestore\OneStepCheckout\Helper\Config')->canShowPasswordMeterValidate();
+?>
+<div id="onestepcheckout-login-popup" style="display:none">
+    <div class="onestepcheckout-popup-wrapper">
+        <div class="onestepcheckout-popup-contents">
+            <div id="onestepcheckout-login-popup-contents-forgot" style="display: none;">
+                <h1><?php echo __('Forgot your password?'); ?></h1>
+                <p class="title-forgot">
+                    <?php echo __('Please enter your email below and we will send you a new password.'); ?>
+                </p>
+                <p class="close">
+                    <a href="javascript:void(0);"><?php echo __('X'); ?></a>
+                </p>
+                <form id="onestepcheckout-forgot-form">
+                    <div id="onestepcheckout-forgot-loading" style="display: none;" class="loading-ajax-login">
+                        &nbsp;</div>
+                    <div id="onestepcheckout-forgot-error" class="onestepcheckout-error" style="display: none;">
+                        &nbsp;</div>
+                    <div id="onestepcheckout-forgot-success" style="display: none;">
+                        <?php echo __('We have already sent a new password to your email address.'); ?>
+                    </div>
+                    <ul id="onestepcheckout-forgot-table">
+                        <li>
+                            <div class="input-box">
+                                <input type="text" class="input-text required-entry validate-email"
+                                       name="onestepcheckout_email" id="id_onestepcheckout_email" required/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <div for="id_onestepcheckout_email" generated="true" class="mage-error" id="id_onestepcheckout_email-error"></div>
+                                <label class="required" for="id_onestepcheckout_email">
+                                    <?php echo __('Email address'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li class="last">
+                            <button class="button" id="onestepcheckout-forgot-button" type="submit">
+                                <?php echo __('Send password'); ?>
+                            </button>
+                            <div class="link-register-forgot">
+                                <p>
+                                    <a href="javascript:void(0);" id="onestepcheckout-return-login-link">
+                                        <span>&nbsp;</span>
+                                        <?php echo __('Return to login'); ?>
+                                    </a>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div id="onestepcheckout-login-popup-contents-login">
+                <h1><?php echo __('Login'); ?></h1>
+                <p class="close"><a href="javascript:void(0);"><?php echo __('X'); ?></a></p>
+                <form id="onestepcheckout-login-form" method="post">
+                    <div id="onestepcheckout-login-loading" style="display: none;" class="loading-ajax-login">
+                        &nbsp;</div>
+                    <div id="onestepcheckout-login-error" class="onestepcheckout-error" style="display: none;">
+                        &nbsp;</div>
+                    <ul id="onestepcheckout-login-table">
+                        <li class="email-icon">
+                            <div class="input-box">
+                                <input tabindex="100" type="text" class="input-text required required-entry validate-email"
+                                       name="onestepcheckout_username" id="id_onestepcheckout_username" required />
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label class="required"
+                                       for="id_onestepcheckout_username"><?php echo __('Email address'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li class="password-icon">
+                            <div class="input-box">
+                                <input type="password" tabindex="101" name="onestepcheckout_password"
+                                       class="input-text required required-entry"
+                                       data-validate="{required:true}"
+                                       id="id_onestepcheckout_password" required/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label class="required" for="id_onestepcheckout_password">
+                                    <?php echo __('Password'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li class="last">
+                            <button class="button" tabindex="102" id="onestepcheckout-login-button"
+                                    type="submit"><?php echo __('Login'); ?></button>
+                            <div class="link-register-forgot">
+                                <p class="forgot-link">
+                                    <a href="javascript:void(0);"
+                                       id="onestepcheckout-forgot-password-link"><span>&nbsp;</span>
+                                        <?php echo __('Forgot your password?'); ?>
+                                    </a>
+                                </p>
+
+                                <p class="register-link">
+                                    <a href="javascript:void(0);" id="onestepcheckout-register-link"><span>&nbsp;</span>
+                                        <?php echo __('Create a new account'); ?>
+                                    </a>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div id="onestepcheckout-login-popup-contents-register" style="display: none;">
+                <h1><?php echo __('Create a new account'); ?></h1>
+                <p class="title-register">
+                    <?php echo __('Please enter the following information to create a new account.'); ?>
+                </p>
+                <p class="close"><a href="javascript:void(0);"><?php echo __('X'); ?></a></p>
+                <form id="onestepcheckout-register-form">
+                    <div id="onestepcheckout-register-loading" style="display: none;" class="loading-ajax-login">
+                        &nbsp;</div>
+                    <div id="onestepcheckout-register-error" class="onestepcheckout-error" style="display: none;">
+                        &nbsp;</div>
+                    <ul id="onestepcheckout-register-table">
+                        <li>
+                            <div class="input-box">
+                                <input tabindex="100" type="text" class="input-text required-entry"
+                                       name="onestepcheckout_firstname" id="id_onestepcheckout_firstname" required/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <div for="id_onestepcheckout_firstname" generated="true" class="mage-error" id="id_onestepcheckout_firstname-error"></div>
+                                <label class="required" for="id_onestepcheckout_firstname"><?php echo __('First Name'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="input-box">
+                                <input tabindex="100" type="text" class="input-text required-entry"
+                                       name="onestepcheckout_lastname" id="id_onestepcheckout_lastname" required/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <div for="id_onestepcheckout_lastname" generated="true" class="mage-error" id="id_onestepcheckout_lastname-error"></div>
+                                <label class="required" for="id_onestepcheckout_lastname">
+                                    <?php echo __('Last Name'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="input-box">
+                                <input tabindex="100" type="text" class="input-text required-entry validate-email"
+                                       name="onestepcheckout_register_username"
+                                       id="id_onestepcheckout_register_username" required/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <div for="id_onestepcheckout_register_username" generated="true" class="mage-error" id="id_onestepcheckout_register_username-error"></div>
+                                <label class="required"
+                                       for="id_onestepcheckout_register_username"><?php echo __('Email address'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <?php if ($canShowPasswordMeterValidate) {?>
+                            <div class="input-box" data-mage-init='{"passwordStrengthIndicator": {}}'>
+                                <input type="password" tabindex="101" name="onestepcheckout_register_password"
+                                       class="input-text required-entry validate-password"
+                                       id="id_onestepcheckout_register_password"
+                                       data-password-min-length="<?php echo $minimumPasswordLength; ?>"
+                                       data-password-min-character-sets="<?php echo $requiredCharacterClassesNumber; ?>"
+                                       data-validate="{required:true, 'validate-customer-password':true}"
+                                       autocomplete="off"
+                                       required/>
+                                <div id="password-strength-meter-container" data-role="password-strength-meter" >
+                                    <div id="password-strength-meter" class="password-strength-meter">
+                                        <?php /* @escapeNotVerified */ echo __('Password Strength'); ?>:
+                                    <span id="password-strength-meter-label" data-role="password-strength-meter-label" >
+                                        <?php /* @escapeNotVerified */ echo __('No Password'); ?></span>
+                                    </div>
+                                </div>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label class="required" for="id_onestepcheckout_register_password">
+                                    <?php echo __('Password'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                            <?php } else {?>
+                                <div class="input-box">
+                                    <input type="password" tabindex="101" name="onestepcheckout_register_password"
+                                           class="input-text required-entry validate-password"
+                                           id="id_onestepcheckout_register_password" required/>
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label class="required" for="id_onestepcheckout_register_password">
+                                        <?php echo __('Password'); ?>
+                                        <em>*</em>
+                                    </label>
+                                </div>
+                            <?php }?>
+
+                        </li>
+                        <li>
+                            <div class="input-box">
+                                <input type="password" tabindex="101" name="onestepcheckout_register_confirm_password"
+                                       class="input-text required-entry"
+                                       id="id_onestepcheckout_register_confirm_password"
+                                       data-validate="{required:true, equalTo:'#id_onestepcheckout_register_password'}"
+                                       autocomplete="off"/>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <div for="id_onestepcheckout_register_confirm_password" generated="true" class="mage-error" id="id_onestepcheckout_register_confirm_password-error"></div>
+                                <label class="required"
+                                       for="id_onestepcheckout_register_confirm_password">
+                                    <?php echo __('Confirm Password'); ?>
+                                    <em>*</em>
+                                </label>
+                            </div>
+                        </li>
+
+                        <li class="last">
+                            <button class="button" tabindex="102" id="onestepcheckout-register-button" type="submit">
+                                <?php echo __('Register'); ?>
+                            </button>
+                            <div class="link-register-forgot">
+                                <p>
+                                    <a href="javascript:void(0);" id="onestepcheckout-return-login-link-2">
+                                        <span>&nbsp;</span>
+                                        <?php echo __('Return to login'); ?>
+                                    </a>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="control_overlay" style="display: none"></div>
+<script>
+    require(['jquery', 'Magestore_OneStepCheckout/js/customer-login'], function ($) {
+        $('#onestepcheckout-login-popup').customerLogin([]);
+    });
+</script>

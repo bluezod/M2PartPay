@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magestore" translate="label" sortOrder="20">
+            <label>Magestore Extension</label>
+        </tab>
+        <section id="onestepcheckout" translate="label" sortOrder="20" type="text" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <class>separator-top</class>
+            <label>One Step Checkout</label>
+            <tab>magestore</tab>
+            <resource>Magestore_OneStepCheckout::config_onestepcheckout</resource>
+            <group id="geoip_notification" translate="label" sortOrder="0" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Geo IP</label>
+                <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Notification</frontend_model>
+            </group>
+            <group id="general" translate="label" sortOrder="1" type="text" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>General Configuration</label>
+                <field id="general_configuration_separator" translate="label comment" sortOrder="10" type="label"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>General</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Separator</frontend_model>
+                </field>
+                <field id="active" translate="label comment" sortOrder="20" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable One Step Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_shipping_address" translate="label comment" sortOrder="25" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable billing to different address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>For Customers that have billing address different from shipping address
+                    </comment>
+                </field>
+
+                <field id="redirect_to_checkout" translate="label comment" sortOrder="26" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Redirect to checkout automatically after adding product to cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+
+                <field id="suggest_address" translate="label comment" sortOrder="33" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable suggesting address by Google</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="google_api_key" translate="label" sortOrder="35" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Google API Key</label>
+                    <depends>
+                        <field id="suggest_address">1</field>
+                    </depends>
+                    <comment><![CDATA[ Click <a href="https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform" target="_blank">here</a> to get API key ]]></comment>
+                </field>
+                
+                <field id="delivery_configuration_separator" translate="label comment" sortOrder="37" type="label"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delivery Date Configuration</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Separator</frontend_model>
+                </field>
+
+                <field id="delivery_time_date" translate="label comment" sortOrder="38" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable Delivery time and date</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="disable_day" translate="label" type="multiselect" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Day</label>
+                    <depends>
+                        <field id="delivery_time_date">1</field>
+                    </depends>
+                    <source_model>Magestore\OneStepCheckout\Model\System\Config\Source\DisableDay</source_model>
+                </field>
+
+
+                <field id="disable_hour" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable hour</label>
+                    <depends>
+                        <field id="delivery_time_date">1</field>
+                    </depends>
+                    <comment>Disable Hour (Example : 0-7,17-23)</comment>
+                </field>
+
+                <field id="is_enable_security_code" translate="label" type="select" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable house security code</label>
+                    <depends>
+                        <field id="delivery_time_date">1</field>
+                    </depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+
+                <field id="defaultinfo_configuration_separator" translate="label comment" sortOrder="42" type="label"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Information</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Separator</frontend_model>
+                </field>
+                <field id="default_payment" translate="label comment" sortOrder="50" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Default Payment Method</label>
+                    <source_model>Magestore\OneStepCheckout\Model\System\Config\Source\Payment</source_model>
+                </field>
+                <field id="default_shipping" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Shipping Method</label>
+                    <source_model>Magestore\OneStepCheckout\Model\System\Config\Source\Shipping</source_model>
+                </field>
+                <field id="country_id" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default country</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <frontend_class>countries</frontend_class>
+                </field>
+                <field id="region_id" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default region/state</label>
+                </field>
+                <field id="postcode" translate="label" sortOrder="90" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default zip/postal code</label>
+                </field>
+                <field id="city" translate="label" sortOrder="100" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default city</label>
+                </field>
+
+                <field id="displayedfields_configuration_separator" translate="label comment" sortOrder="110" type="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Displayed Fields</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Separator</frontend_model>
+                </field>
+                <field id="checkout_title" translate="label" sortOrder="120" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout title</label>
+                </field>
+                <field id="checkout_description" translate="label" sortOrder="130" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout description</label>
+                </field>
+                <field id="show_comment" translate="label" sortOrder="150" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable adding comment to order</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_newsletter" translate="label" sortOrder="160" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Newsletter checkbox</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="newsletter_default_checked" translate="label" sortOrder="170" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Newsletter checkbox checked by default</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="show_newsletter">1</field>
+                    </depends>
+                </field>
+                <field id="show_discount" translate="label" sortOrder="180" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Discount Code section</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="order_review_image" translate="label comment" sortOrder="210" type="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product Thumbnail Shown In Order Review Section</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\Separator</frontend_model>
+                </field>
+                <field id="enable_items_image" translate="label" sortOrder="220" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="field_position_management" translate="label" sortOrder="2" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Field Position Management</label>
+                <field id="position" translate="label" sortOrder="1" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Field Position Management</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\FieldPosition</frontend_model>
+                </field>
+            </group>
+
+            <group id="geoip_management" translate="label" sortOrder="3" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Geo IP</label>
+                <field id="geoip_guide" translate="label" sortOrder="1" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Geo IP Guide</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\GeoIpGuide</frontend_model>
+                </field>
+                <field id="geo_ip" translate="label comment" sortOrder="2" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Geo IP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="login_link" translate="label" sortOrder="20" type="text" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Login Link Config</label>
+                <field id="show_login_link" translate="label comment" sortOrder="1" type="select" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Show Login Link</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="login_link_title" translate="label comment" sortOrder="4" type="textarea" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Login Message</label>
+                    <depends>
+                        <field id="show_login_link">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="order_notification" translate="label" sortOrder="8" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Admin Order Notification</label>
+                <field id="enable_notification" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable email notification</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="template" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification email template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification">1</field>
+                    </depends>
+                </field>
+                <field id="notification_email" translate="label comment" sortOrder="30" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email(s) received notification</label>
+                    <depends>
+                        <field id="enable_notification">1</field>
+                    </depends>
+                    <comment>Separated by ','
+                    </comment>
+                </field>
+            </group>
+            <group id="giftwrap" translate="label comment" sortOrder="10" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Gift Wrap Configuration</label>
+                <field id="enable_giftwrap" translate="label" sortOrder="14" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable gift wrap</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="giftwrap_type" translate="label" sortOrder="15" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Gift wrap type</label>
+                    <source_model>Magestore\OneStepCheckout\Model\System\Config\Source\GiftWrap</source_model>
+                    <depends>
+                        <field id="enable_giftwrap">1</field>
+                    </depends>
+                    <comment>To calculate gift wrap fee based on item or order.</comment>
+                </field>
+                <field id="giftwrap_amount" translate="label" sortOrder="16" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Gift wrap fee</label>
+                    <depends>
+                        <field id="enable_giftwrap">1</field>
+                    </depends>
+                    <comment>Enter the amount of gift wrap fee.</comment>
+                </field>
+            </group>
+            <group id="giftmessage" translate="label comment" sortOrder="15" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Gift Message Configuration</label>
+                <field id="enable_giftmessage" translate="label" sortOrder="13" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable gift message</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="style_management" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Style Management</label>
+                <field id="style" translate="label" sortOrder="1" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Style Management</label>
+                    <frontend_model>Magestore\OneStepCheckout\Block\System\Config\FieldStyle</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

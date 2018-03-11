@@ -1,0 +1,31 @@
+<?php if (!$block->isHasLibrary() && !$block->isHasGeoIpDataFile()) :?>
+    <p id="geoip-content">
+        <?php if (!$block->isHasLibrary()) :?>
+            <br />
+            <b><?php echo __('Step 1: Install GeoIP Library');?></b>
+
+            <br />
+            <?php echo __('Please log in to your SSH. Use cd command to your Magento root folder. After that, enter the command:');?>
+            <br />
+            <b>composer require geoip2/geoip2</b>
+            <br />
+            <br />
+            <?php echo __('If your Magento need the authentication, please log in to your Magento connect and go to ');?><a href="https://www.magentocommerce.com/magento-connect/customerdata/accessKeys/list/"><?php echo __('this link.');?></a>
+            <?php echo __('After that, please generate the public key and the private key. Finally, copy them and fill them to Magento authentication.');?>
+
+            <br />
+            <br />
+        <?php endif;?>
+
+        <br />
+        <b><?php echo __('Step 2: Download GeoIP Data file');?></b>
+        <br />
+        <?php if (!$block->isHasGeoIpDataFile()) :?>
+            <?php echo __('Please download this file:'); ?>
+            <a href="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz">GeoLite2-City.mmdb.gz</a>.
+            <?php echo __('After extracting the file, you will receive GeoLite2-City.mmdb file. ');?>
+            <?php echo __('Then please log in to your FTP and upload this file to ');?><b>[Magento 2 Folder]/pub/media/magestore/osc/GeoLite2-City.mmdb</b>
+        <?php endif;?>
+        <br />
+    </p>
+<?php endif;?>

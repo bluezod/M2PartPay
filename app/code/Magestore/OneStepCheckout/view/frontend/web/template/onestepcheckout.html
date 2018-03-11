@@ -1,0 +1,183 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko foreach: getRegion('messages') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!--/ko-->
+
+<!-- ko foreach: getRegion('osc-before') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!--/ko-->
+<ol class="one-step-checkout three-columns-new-osc clearfix" data-bind="css:{virtualCheckout:isVirtual()},afterRender:afterRender">
+    <li class="address-order">
+        <div id="one-step-checkout-form">
+            <div class="wrap-case-3colums">
+                <div class="wrap-case-3colums">
+                    <!--ko if:!isVirtual() -->
+                    <div class="address-information address-info-3-columns">
+                        <div id='onestepcheckout-shipping-section'>
+                            <!-- ko foreach: getRegion('steps') -->
+                                <!-- ko foreach: getRegion('shipping-step') -->
+                                    <!-- ko foreach: getRegion('shipping-address') -->
+                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                <!--/ko-->
+                            <!--/ko-->
+                        </div>
+                    </div>
+                    <!--/ko-->
+
+                    <div class="onestepcheckout-shipping-payment-review">
+                        <!--ko if:!isVirtual() -->
+                            <div class="order-information shipping-method-information order-info-3-columns">
+                                <ol>
+                                    <li class="shipping-method" id="shipping-method-wrapper">
+                                        <div class="ajax-loader3 ajax-loader-shipping-method" id="ajax-shipping"></div>
+                                        <!-- ko foreach: getRegion('steps') -->
+                                            <!-- ko foreach: getRegion('shipping-step') -->
+                                                <!-- ko foreach: getRegion('shipping-method') -->
+                                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                                <!--/ko-->
+                                            <!--/ko-->
+                                        <!--/ko-->
+                                    </li>
+                                    <!-- ko foreach: getRegion('delivery-date') -->
+                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                </ol>
+                                <div id="control_overlay_shipping"></div>
+
+                            </div>
+                            <span class="no-display">
+                                <label for="shipping_method">
+                                    <input name="shipping_method" type="radio" value="" id="s_method_"
+                                           checked="checked"/>
+                                </label>
+                            </span>
+                        <!--/ko-->
+
+                        <div class="order-review-section">
+                            <ol>
+                                <li class="payment-method">
+                                    <div class="ajax-loader3 ajax-loader-payment" id="ajax-payment"></div>
+                                    <h3 id="payment_method_step_header" class="step_4" data-bind="i18n:'Payment'"></h3>
+                                    <div class="clear"></div>
+                                    <div id="onestepcheckout-payment-methods" class="onestepcheckout-payment-methods">
+                                        <!-- ko foreach: getRegion('steps') -->
+                                            <!-- ko foreach: getRegion('billing-step') -->
+                                                <!-- ko foreach: getRegion('payment') -->
+                                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                                <!--/ko-->
+                                            <!--/ko-->
+                                        <!--/ko-->
+                                    </div>
+                                </li>
+                            </ol>
+                            <div id="control_overlay_payment"></div>
+                        </div>
+                    </div>
+                    <div class="wrap-col-last-3">
+                        <div class="onestepcheckout-review-info">
+                            <ol>
+                                <li class="order-review-info">
+                                    <div class="ajax-loader3 ajax-loader-order-review" id="ajax-review"></div>
+                                    <div class="clear"></div>
+                                    <div id="checkout-review-load" class="default-box checkout-review-load">
+                                        <div id="checkout-review-table-wrapper">
+                                            <h3 style="float:left" id="review_step_header" data-bind="i18n: 'Order Review'"></h3>
+                                            <table id="checkout-review-table" class="data-table">
+                                                <colgroup>
+                                                    <col>
+                                                    <col width="1">
+                                                    <col width="1">
+                                                    <col width="1">
+                                                </colgroup>
+                                                <thead>
+                                                    <tr class="first odd">
+                                                        <th class="a-left" rowspan="1" style="width:65%" data-bind="i18n: 'Product'"></th>
+                                                        <th class="a-right" rowspan="1" style="width:21%; padding:10px 20px" data-bind="i18n: 'Qty'"></th>
+                                                        <th class="a-right" colspan="1" style="width:30%" data-bind="i18n: 'Subtotal'"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- ko foreach: getRegion('sidebar') -->
+                                                        <!-- ko foreach: getRegion('summary') -->
+                                                            <!-- ko foreach: getRegion('item-review') -->
+                                                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                                                <!--/ko-->
+                                                        <!--/ko-->
+                                                    <!--/ko-->
+                                                </tbody>
+                                            </table>
+                                            <table id="checkout-total-table" class="data-table">
+                                                <tbody>
+                                                    <!-- ko foreach: getRegion('sidebar') -->
+                                                        <!-- ko foreach: getRegion('summary') -->
+                                                            <!-- ko foreach: getRegion('totals') -->
+                                                            <!-- ko template: getTemplate() --><!-- /ko -->
+                                                            <!--/ko-->
+                                                        <!--/ko-->
+                                                    <!--/ko-->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- ko foreach: getRegion('discount') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <!-- ko foreach: getRegion('order-comment') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <!-- ko foreach: getRegion('gift-message') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <!-- ko foreach: getRegion('sign-up-newsletter') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <!-- ko foreach: getRegion('gift-wrap') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <!-- ko foreach: getRegion('survey') -->
+                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                    <!--/ko-->
+                                    <div class="ajax-loader3 ajax-loader-order-review" id="ajax-loader3"></div>
+                                    <div id="control_overlay_review"></div>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="button-set clearfix button-onestepcheckout">
+                            <div class="clear"></div>
+                            <button id="onestepcheckout-button-place-order" type="button"
+                                    class="btn-proceed-checkout onestepcheckout-btn-checkout onestepcheckout-place"
+                                    data-bind="attr:{title:$t('Place Order')},click:prepareToPlaceOrder,enable:enableCheckout">
+                                <span>
+                                    <span class="title" data-bind="i18n:'Place order now'"></span>
+                                </span>
+                            </button>
+                            <button style="display: none"
+                                    id="onestepcheckout-button-continue-to-paypal" type="button"
+                                    class="btn-continue-to-paypal action primary" 
+                                    data-bind="attr:{title:$t('Place Order')}">
+                                <span>
+                                    <span class="title" data-bind="i18n:'Continue to PayPal'"></span>
+                                </span>
+                            </button>
+                        </div>
+                        <!--ko if:placingOrder-->
+                        <div id="onestepcheckout-place-order-loading" class="show">
+                            <p data-bind="i18n:'Please wait, processing your order...'"></p>
+                        </div>
+                        <!--/ko-->
+                        <div id="onestepcheckout-error-messages" class="show" data-bind="fadeVisible:errorMessage">
+                            <p data-bind="i18n:errorMessage"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+</ol>

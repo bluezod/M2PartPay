@@ -1,0 +1,196 @@
+<?php
+
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+
+$scopeId = $block->getScopeId();
+$scope = $block->getScope();
+$defaultLabel = __('Use Default');
+$defaultTitle = __('-- Please Select --');
+$scopeLabel = __('STORE VIEW');
+?>
+<?php $path = "onestepcheckout/style_management/style";?>
+<?php $data = $block->getFieldEnableBackEnd($path, $scope, $scopeId); ?>
+<?php $active = ($scope == 'default' || !empty($data)); ?>
+<?php $style = $block->getDefaultField($path, $scope, $scopeId);?>
+<?php
+$customPath = 'onestepcheckout/style_management/custom_style';
+$custom = $this->getDefaultField($customPath, $scope, $scopeId);
+?>
+<div class="color-title"><?php echo  __('Style Color');?></div>
+<table>
+    <tr>
+<td class="value">
+    <select data-current-value="" style="width: 280px;margin-left:30px;"
+            id="<?php echo $block->getElementHtmlId('style') ?>"
+            name="<?php echo $block->getElementHtmlName('style') ?>"
+        <?php echo $active ? '' : 'disabled=""' ?>
+            class="select"
+        >
+        <?php foreach ($block->getFieldOptions() as $value => $label): ?>
+            <?php $selected = $data ? $data : $block->getDefaultField($path, $scope, $scopeId); ?>
+            <option
+                value="<?php echo $value ?>" <?php echo ($selected == $value) ? 'selected="selected"' : '' ?>>
+                <?php echo $label ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <label for="<?php echo $block->getElementHtmlId('style') ?>"></label>
+</td>
+<?php if ($scope != 'default'): ?>
+    <td class="use-default">
+        <input type="checkbox" value="1" class="checkbox config-inherit"
+               id="<?php echo $block->getCheckBoxElementHtmlId('style') ?>"
+               name="<?php echo $block->getCheckBoxElementHtmlName('style') ?>"
+            <?php echo $data ? '' : 'checked="checked"' ?>
+               onclick="toggleValueElements(this, Element.previous(this.parentNode))"
+            />
+        <label for="<?php echo $block->getCheckBoxElementHtmlId('style') ?>"
+               class="inherit"
+               title="<?php echo $defaultTitle ?>">
+            <?php echo $defaultLabel ?>
+        </label>
+    </td>
+
+<td class="scope-label">[<?php echo $scopeLabel ?>]</td>
+
+<?php endif;?>
+</tr></table>
+<?php if ($style=='custom') :?>
+   <div id="showreview"></div>
+   <div id="style-color">
+       <label for="onestepcheckout_style_management_custom"></label>
+        <input value="<?php echo $custom;?>"
+               style="background-color: <?php echo $custom?>"
+               name=groups[style_management][fields][custom_style][value]
+               class="jscolor custom-color"
+               id="onestepcheckout_style_management_custom" />
+    </div>
+<?php else :?>
+    <div id="showreview">
+        <img width="957px" src="<?php echo $block->getImageColor($style);?>" />
+    </div>
+     <div id="style-color" style="display: none">
+         <label for="onestepcheckout_style_management_custom"></label>
+        <input value="" name="groups[style_management][fields][custom_style][value]"
+               class="jscolor custom-color"
+               id="onestepcheckout_style_management_custom" />
+    </div>
+<?php endif;?>
+<?php $path = "onestepcheckout/style_management/button";?>
+<?php $data = $block->getFieldEnableBackEnd($path, $scope, $scopeId); ?>
+<?php $active = ($scope == 'default' || !empty($data)); ?>
+<?php $buttonStyle = $block->getDefaultField($path, $scope, $scopeId);?>
+<?php
+$customButtonPath = 'onestepcheckout/style_management/custom_button';
+$customButton =  $block->getDefaultField($customButtonPath, $scope, $scopeId);
+?>
+<div class="color-title"><?php echo  __('"Place Order Now" button Color');?></div>
+<table>
+    <tr>
+        <td class="value">
+            <label for="<?php echo $block->getElementHtmlId('button') ?>"></label>
+            <select data-current-value="" style="width: 280px;margin-left:30px;"
+                    id="<?php echo $block->getElementHtmlId('button') ?>"
+                    name="<?php echo $block->getElementHtmlName('button') ?>"
+                <?php echo $active ? '' : 'disabled=""' ?>
+                    class="select"
+                >
+                <?php foreach ($block->getFieldOptions() as $value => $label): ?>
+                    <?php $selected = $data ? $data : $block->getDefaultField($path, $scope, $scopeId); ?>
+                    <option
+                        value="<?php echo $value ?>" <?php echo ($selected == $value) ? 'selected="selected"' : '' ?>>
+                        <?php echo $label ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+        <?php if ($scope != 'default'): ?>
+            <td class="use-default">
+                <input type="checkbox" value="1" class="checkbox config-inherit"
+                       id="<?php echo $block->getCheckBoxElementHtmlId($path) ?>"
+                       name="<?php echo $block->getCheckBoxElementHtmlName($path) ?>"
+                    <?php echo $data ? '' : 'checked="checked"' ?>
+                       onclick="toggleValueElements(this, Element.previous(this.parentNode))"
+                    />
+                <label for="<?php echo $block->getCheckBoxElementHtmlId($path) ?>"
+                       class="inherit"
+                       title="<?php echo $defaultTitle ?>">
+                    <?php echo $defaultLabel ?>
+                </label>
+            </td>
+
+            <td class="scope-label">[<?php echo $scopeLabel ?>]</td>
+
+        <?php endif;?>
+    </tr></table>
+<?php if ($buttonStyle=='custom') :?>
+    <div id="edit-button-color">
+        <label for="<?php echo $block->getElementHtmlId('custom_button') ?>"></label>
+        <input value="<?php echo $customButton;?>"
+               style="background-color: <?php echo $customButton?>"
+               id="<?php echo $block->getElementHtmlId('custom_button') ?>"
+               name="<?php echo $block->getElementHtmlName('custom_button') ?>"
+               class="jscolor custom-color"/>
+    </div>
+<?php else :?>
+    <div id="edit-button-color" style="display: none">
+        <label for="<?php echo $block->getElementHtmlId('custom_button') ?>"></label>
+        <input value=""
+               id="<?php echo $block->getElementHtmlId('custom_button') ?>"
+               name="<?php echo $block->getElementHtmlName('custom_button') ?>"
+               class="jscolor custom-color"/>
+    </div>
+<?php endif;?>
+<style type="text/css">
+    .custom-color {
+        margin-left: 30px;
+        margin-top:10px;
+    }
+    .color-title {
+        margin-top: 10px;
+        font-weight: bold;
+        border-bottom: 1px solid rgb(223, 223, 223);
+    }
+    #onestepcheckout_style_management_style, #onestepcheckout_style_management_button {
+        width: 280px;
+        margin-left:30px;
+    }
+</style>
+<script type="text/javascript">
+    require(["Magestore_OneStepCheckout/js/jscolor.min"],function($){});
+    require(["jquery"],function($){
+        var styleObject = $("#onestepcheckout_style_management_style");
+        var styleButtonObject = $("#onestepcheckout_style_management_button");
+        var showReview = $("#showreview");
+        styleObject.change(function(){
+            var optionSelect = styleObject.find("option:selected");
+            var optionSelectValue = optionSelect.val();
+            if (optionSelectValue=="custom") {
+                showReview.hide();
+                $("#style-color").show();
+            } else {
+                var show = "<img width=\"957px\" src=\"<?php echo $this->getViewFileUrl('Magestore_OneStepCheckout::images/style'); ?>";
+                show +="/"+optionSelectValue+".png\" />";
+                showReview.html(show);
+                showReview.show();
+                $("#style-color").hide();
+            }
+        });
+        styleButtonObject.change(function(){
+            var optionSelect = styleButtonObject.find("option:selected");
+            var optionSelectValue = optionSelect.val();
+            if (optionSelectValue == "custom") {
+                $("#edit-button-color").show();
+            } else {
+                $("#edit-button-color").hide();
+            }
+        });
+    });
+</script>

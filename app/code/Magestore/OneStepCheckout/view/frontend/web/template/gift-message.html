@@ -1,0 +1,68 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko if: isActive() || hasActiveOptions() -->
+<div class="onestepcheckout-giftmessage">
+    <div class="gift-messages checkbox-group">
+        <!-- ko if: getObservable('message') -->
+        <input type="checkbox" name="allow_gift_messages" id="allow_gift_messages" checked="checked" class="checkbox osc-additional-data"
+               data-bind="click: $data.toggleFormBlockVisibility.bind($data)">
+        <!-- /ko -->
+        <!-- ko ifnot: getObservable('message') -->
+        <input type="checkbox" name="allow_gift_messages" id="allow_gift_messages" class="checkbox osc-additional-data"
+               data-bind="click: $data.toggleFormBlockVisibility.bind($data)">
+        <!-- /ko -->
+        <label for="allow_gift_messages" class="label--checkbox">
+            <span class="check"></span>
+            <span class="box-check"></span>
+            <!-- ko text: $t('Add a gift message to my order') --><!-- /ko -->
+        </label>
+    </div>
+    <div class="gift-messages-form" id="allow-gift-message-container" style="display: none;">
+        <div class="inner-box">
+            <div class="whole-order">
+                <input id="giftmessage-type" type="hidden" name="giftmessage" value="quote">
+                <ul class="onestepcheckout-form-list">
+                    <!-- ko ifnot: resultBlockVisibility() -->
+                    <li class="gift-options">
+                        <!-- ko foreach: getRegion('additionalOptions') -->
+                        <!-- ko template: getTemplate() --><!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko template: formTemplate --><!--/ko-->
+                    </li>
+                    <!-- /ko -->
+                    <li class="gift-summary">
+                        <!-- ko if: resultBlockVisibility() -->
+                        <!-- ko foreach: getRegion('additionalOptions') -->
+                        <!--ko template: appliedTemplate --><!-- /ko -->
+                        <!-- /ko -->
+
+                        <!-- ko if: getObservable('message') -->
+                        <div class="gift-message-summary">
+                            <span data-bind="i18n: 'Message:'"></span>
+                            <!-- ko text: getObservable('message') --><!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                        <div class="actions-toolbar">
+                            <div class="secondary">
+                                <button type="submit"
+                                        class="action action-edit"
+                                        data-bind="attr: {title: $t('Edit')}, click: $data.editOptions.bind($data)">
+                                    <span data-bind="i18n: 'Edit'"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
+
+

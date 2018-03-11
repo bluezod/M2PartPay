@@ -1,0 +1,44 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<tr class="even">
+    <td>
+        <div class="osc-delete" data-bind="click: function(){deleteItem($parent)}"></div>
+        <!-- ko foreach: getRegion('before_details') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+        <h2 class="product-name"  data-bind="text: $parent.name"></h2>
+        <!-- ko if: (JSON.parse($parent.options).length > 0)-->
+        <dl class="item-options">
+            <!--ko foreach: JSON.parse($parent.options)-->
+            <dt class="label" data-bind="text: label"></dt>
+            <!-- ko if: ($data.full_view)-->
+            <dd class="values" data-bind="html: full_view"></dd>
+            <!-- /ko -->
+            <!-- ko ifnot: ($data.full_view)-->
+            <dd class="values" data-bind="html: value"></dd>
+            <!-- /ko -->
+            <!-- /ko -->
+        </dl>
+        <!-- /ko -->
+    </td>
+    <td class="a-center qty-box">
+        <div class="box-qty" data-item-id="<?php echo $_item->getId(); ?>">
+            <label for="qty_input"></label>
+            <input  class="qty qty-item-display" data-bind="value: $parent.qty, event :{change: function(){updateNewQty($parent)}}"
+                    id="qty_input" />
+            <div class="control-qty">
+                <div data-change-type="add" class="osc-add" data-bind="click: function(){addQty($parent)}"></div>
+                <div data-change-type="minus" class="osc-minus" data-bind="click: function(){minusQty($parent)}"></div>
+            </div>
+        </div>
+    </td>
+    <td class="a-right last">
+        <!-- ko foreach: getRegion('after_details') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </td>
+</tr>

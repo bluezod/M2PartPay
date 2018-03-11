@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+
+$styleUse = $block->getStyleColor();
+$background_button = $block->getButtonColor();
+if (!$styleUse) {
+    $styleUse = 'black';
+}
+if (!$background_button) {
+    $background_button = 'black';
+}
+?>
+
+<style type="text/css">
+    ol, ul {
+        list-style: outside none none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .one-step-checkout h3 {
+        /* background-color:
+
+    <?php //echo $styleUse ?>   !important;*/
+    }
+
+    .one-step-checkout h3:before {
+        background-color: <?php echo $styleUse ?> !important;
+    }
+
+    .checkbox:checked:before {
+        border-color: <?php echo $styleUse ?> !important;
+    }
+
+    .one-step-checkout .radioparent .inner, .payment-method .inner {
+        background-color: <?php echo $styleUse ?> !important
+    }
+
+    .one-step-checkout .radioparent input:checked + .outer, .payment-method input[type='radio']:checked + .outer {
+        border: 2px solid <?php echo $styleUse ?> !important;
+    }
+
+    button.onestepcheckout-btn-checkout {
+        background: <?php echo $background_button ?> !important;
+    }
+    
+    #customer-email-fieldset button,
+    button.osc-ok-button,
+    button#add_coupon_code_button,
+    .onestepcheckout-popup-wrapper h1,
+    #onestepcheckout-login-popup button.button,
+    #onestepcheckout-forgot-button,
+    #onestepcheckout-toc-popup h1,
+    .onestepcheckout-login-link a span,
+    #onestepcheckout-forgot-table li.last p a span,
+    #onestepcheckout-register-table li.last p a span,
+    p.forgot-link a span,
+    p.register-link a span {
+        background-color: <?php echo $styleUse ?> !important;
+
+    }
+
+    p.forgot-link a,
+    p.register-link a,
+    .onestepcheckout-login-link a,
+    #onestepcheckout-forgot-table li.last p a,
+    #onestepcheckout-register-table li.last p a {
+        color: <?php echo $styleUse ?> !important;
+    }
+
+    .gift-messages-form .bar:before,
+    .gift-messages-form .bar:after,
+    #onestepcheckout-login-popup .bar:before,
+    #onestepcheckout-login-popup .bar:after,
+    .onestepcheckout-discount .discount-form .bar:before,
+    .onestepcheckout-discount .discount-form .bar:after,
+    #shipping .bar:before,
+    #shipping .bar:after,
+    #billing-new-address-form .bar:before,
+    #billing-new-address-form .bar:after {
+        background: <?php echo $styleUse ?> !important;
+    }
+
+    .checkbox-group label .check {
+        border: 2px solid <?php echo $styleUse ?>;
+        border-top: none;
+        border-left: none;
+    }
+    
+    #onestepcheckout-login-popup #onestepcheckout-register-button,
+    #onestepcheckout-login-popup #onestepcheckout-forgot-button,
+    #onestepcheckout-forgot-button,
+    #onestepcheckout-login-popup #onestepcheckout-login-button {
+        color: <?php echo $styleUse ?> !important;
+    }
+
+    .onestepcheckout-index-index #osc_top_links a {
+        background: <?php echo $styleUse?>;
+    }
+
+</style>

@@ -1,0 +1,29 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<form class="form form-shipping-address" id="co-shipping-form" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}">
+    <!-- ko foreach: getRegion('before-fields') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+    <div id="shipping-new-address-form" class="fieldset address">
+        <!-- ko foreach: getRegion('additional-fieldsets')-->
+            <!-- ko if:$parent.sortFields($data) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        <!--/ko-->
+        <!-- ko if: (isCustomerLoggedIn) -->
+        <div class="field choice checkbox-group" data-bind="visible: !isFormInline">
+            <input type="checkbox" class="checkbox" id="shipping-save-in-address-book" data-bind="checked: saveInAddressBook" />
+            <label class="label label--checkbox" for="shipping-save-in-address-book">
+                <span class="check"></span>
+                <span class="box-check"></span>
+                <strong data-bind="i18n: 'Save in address book'"></strong>
+            </label>
+        </div>
+        <!-- /ko -->
+        <div data-bind="afterRender:initGoogleAddress"></div>
+    </div>
+</form>

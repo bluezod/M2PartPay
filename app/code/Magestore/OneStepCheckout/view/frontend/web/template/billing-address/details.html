@@ -1,0 +1,31 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<div class="billing-address-details" data-bind="if: isAddressDetailsVisible() && currentBillingAddress()">
+    <!-- ko text: currentBillingAddress().prefix --><!-- /ko -->
+    <!-- ko text: currentBillingAddress().firstname --><!-- /ko -->
+    <!-- ko text: currentBillingAddress().lastname --><!-- /ko -->
+    <!-- ko text: currentBillingAddress().suffix --><!-- /ko --><br/>
+    <!-- ko text: currentBillingAddress().street --><!-- /ko -->
+    <!-- ko if: currentBillingAddress().street[1] !== '' -->,<!-- /ko -->
+    <!-- ko text: currentBillingAddress().city --><!-- /ko -->
+    <!-- ko if: typeof(currentBillingAddress().city) !== 'undefined' -->, <!-- /ko -->
+    <!-- ko text: currentBillingAddress().region --><!-- /ko -->
+    <!-- ko if: typeof(currentBillingAddress().region) !== 'undefined' -->, <!-- /ko -->
+    <!-- ko text: currentBillingAddress().postcode --><!-- /ko -->
+    <!-- ko if: currentBillingAddress().postcode !== '' -->, <!-- /ko -->
+    <!-- ko text: getCountryName(currentBillingAddress().countryId) --><!-- /ko -->
+    <!-- ko if: typeof(currentBillingAddress().telephone) !== 'undefined' -->, <!-- /ko -->
+    <!-- ko text: currentBillingAddress().telephone --><!-- /ko -->
+    
+    <div class='clear'></div>
+    <button type="button"
+            class="action action-edit-address osc-edit-button"
+            data-bind="visible: !addressSameAsShipping(), click: editAddress">
+        <span data-bind="i18n: 'Edit'"></span>
+    </button>
+    <div class="clear"></div>
+</div>

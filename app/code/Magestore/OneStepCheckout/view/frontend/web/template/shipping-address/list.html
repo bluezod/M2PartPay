@@ -1,0 +1,26 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko if: (visible)-->
+<div class="field addresses">
+    <div class="control">
+        <div class="shipping-address-items">
+            <!-- ko foreach: { data: elems, as: 'element' } -->
+                <!-- ko ifnot: (element.address().isEditable()) -->
+                <!-- ko template: element.getTemplate() --><!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko foreach: { data: elems, as: 'element' } -->
+                <!-- ko if: (element.address().isEditable()) -->
+                <!-- ko template: element.getTemplate() --><!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <div data-bind="afterRender:autoSelectAddress"></div>
+    </div>
+</div>
+<!-- /ko -->

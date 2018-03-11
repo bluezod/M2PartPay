@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Magestore_OneStepCheckout::css/theme/material/onestepcheckout.css"/>
+    </head>
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" after="-" name="osc.login"
+                template="Magestore_OneStepCheckout::login.phtml"/>
+            <block class="Magestore\OneStepCheckout\Block\Layout\Style" as="onestepcheckout.style"
+                   name="onestepcheckout_style" template="Magestore_OneStepCheckout::style.phtml"/>
+        </referenceContainer>
+        <referenceBlock name="checkout.root">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magestore_OneStepCheckout::onestepcheckout.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="types" xsi:type="array">
+                        <item name="form.input" xsi:type="array">
+                            <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                            <item name="config" xsi:type="array">
+                                <item name="provider" xsi:type="string">checkoutProvider</item>
+                                <item name="deps" xsi:type="array">
+                                    <item name="0" xsi:type="string">checkoutProvider</item>
+                                </item>
+                                <item name="template" xsi:type="string">ui/form/field</item>
+                                <item name="elementTmpl" xsi:type="string">Magestore_OneStepCheckout/form/element/input</item>
+                            </item>
+                        </item>
+                    </item>
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/osc</item>
+                            <item name="config" xsi:type="array">
+                                <item name="template" xsi:type="string">Magestore_OneStepCheckout/onestepcheckout</item>
+                            </item>
+                            <item name="children" xsi:type="array">
+                                <item name="osc-before" xsi:type="array">
+                                    <item name="sortOrder" xsi:type="string">0</item>
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/osc-before</item>
+                                    <item name="displayArea" xsi:type="string">osc-before</item>
+                                </item>
+                                <item name="delivery-date" xsi:type="array">
+                                    <item name="sortOrder" xsi:type="string">11</item>
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/delivery-date</item>
+                                    <item name="displayArea" xsi:type="string">delivery-date</item>
+                                </item>
+                                <item name="steps" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="displayArea" xsi:type="string">steps</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="component" xsi:type="string">uiComponent</item>
+                                            <item name="sortOrder" xsi:type="string">1</item>
+                                            <item name="displayArea" xsi:type="string">shipping-step</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="step-config" xsi:type="array">
+                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipping-rates-validation" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <!--Step configuration components-->
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                                <item name="shipping-method" xsi:type="array">
+                                                    <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/shipping/methods</item>
+                                                    <item name="template" xsi:type="string">Magestore_OneStepCheckout/shipping-method/list</item>
+                                                    <item name="displayArea" xsi:type="string">shipping-method</item>
+                                                    <item name="children" xsi:type="array">
+                                                    </item>
+                                                </item>
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="deps" xsi:type="array">
+                                                            <item name="0" xsi:type="string">checkout.steps.shipping-step.step-config</item>
+                                                            <item name="1" xsi:type="string">checkoutProvider</item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/shipping</item>
+                                                    <item name="displayArea" xsi:type="string">shipping-address</item>
+                                                    <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                    <item name="sortOrder" xsi:type="string">1</item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="customer-email" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/form/element/email</item>
+                                                            <item name="displayArea" xsi:type="string">customer-email</item>
+                                                            <item name="tooltip" xsi:type="array">
+                                                                <item name="description" xsi:type="string" translate="true">We'll send your order confirmation here.</item>
+                                                            </item>
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="before-login-form" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                                    <item name="displayArea" xsi:type="string">before-login-form</item>
+                                                                    <item name="children" xsi:type="array">
+                                                                        <!-- before login form fields -->
+                                                                    </item>
+                                                                </item>
+                                                                <item name="additional-login-form-fields" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">uiComponent</item>
+                                                                    <item name="displayArea" xsi:type="string">additional-login-form-fields</item>
+                                                                    <item name="children" xsi:type="array">
+                                                                        <!-- additional login form fields -->
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                        <item name="before-form" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">before-form</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- before form fields -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="before-fields" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">before-fields</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- before fields -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="address-list" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/shipping-address/list</item>
+                                                            <item name="displayArea" xsi:type="string">address-list</item>
+                                                        </item>
+                                                        <item name="address-list-additional-addresses" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">address-list-additional-addresses</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- address-list-additional-addresses -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="before-shipping-method-form" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">before-shipping-method-form</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- address-list-additional-addresses -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="shipping-address-fieldset" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="deps" xsi:type="array">
+                                                                    <item name="0" xsi:type="string">checkoutProvider</item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="displayArea" xsi:type="string">additional-fieldsets</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- The following items override configuration of corresponding address attributes -->
+                                                                <item name="region" xsi:type="array">
+                                                                    <!-- Make region attribute invisible on frontend. Corresponding input element is created by region_id field -->
+                                                                    <item name="visible" xsi:type="boolean">false</item>
+                                                                </item>
+                                                                <item name="region_id" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Magento_Ui/js/form/element/region</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="template" xsi:type="string">ui/form/field</item>
+                                                                        <item name="elementTmpl" xsi:type="string">ui/form/element/select</item>
+                                                                        <item name="customEntry" xsi:type="string">shippingAddress.region</item>
+                                                                    </item>
+                                                                    <item name="validation" xsi:type="array">
+                                                                        <item name="required-entry" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <!-- Value of region_id field is filtered by the value of county_id attribute -->
+                                                                    <item name="filterBy" xsi:type="array">
+                                                                        <item name="target" xsi:type="string"><![CDATA[${ $.provider }:${ $.parentScope }.country_id]]></item>
+                                                                        <item name="field" xsi:type="string">country_id</item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="postcode" xsi:type="array">
+                                                                    <!-- post-code field has custom UI component -->
+                                                                    <item name="component" xsi:type="string">Magento_Ui/js/form/element/post-code</item>
+                                                                    <item name="validation" xsi:type="array">
+                                                                        <item name="required-entry" xsi:type="string">true</item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="company" xsi:type="array">
+                                                                    <item name="validation" xsi:type="array">
+                                                                        <item name="min_text_length" xsi:type="number">0</item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="fax" xsi:type="array">
+                                                                    <item name="validation" xsi:type="array">
+                                                                        <item name="min_text_length" xsi:type="number">0</item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="country_id" xsi:type="array">
+                                                                    <item name="sortOrder" xsi:type="string">115</item>
+                                                                </item>
+                                                                <item name="telephone" xsi:type="array">
+                                                                    <item name="config" xsi:type="array">
+                                                                        <!--<item name="tooltip" xsi:type="array">-->
+                                                                            <!--<item name="description" xsi:type="string" translate="true">For delivery questions.</item>-->
+                                                                        <!--</item>-->
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="billing-step" xsi:type="array">
+                                            <item name="component" xsi:type="string">uiComponent</item>
+                                            <item name="displayArea" xsi:type="string">billing-step</item>
+                                            <item name="sortOrder" xsi:type="string">2</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="payment" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment</item>
+                                                    <item name="displayArea" xsi:type="string">payment</item>
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="title" xsi:type="string" translate="true">Payment</item>
+                                                    </item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="customer-email" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/form/element/email</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="sidebar" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="summary" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="totals" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="gift-wrap" xsi:type="array">
+                                                            <item name="component"  xsi:type="string">Magestore_OneStepCheckout/js/view/summary/gift-wrap</item>
+                                                            <item name="sortOrder" xsi:type="string">20</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="title" xsi:type="string" translate="true">Gift wrap</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="discount" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/discount</item>
+                                    <item name="displayArea" xsi:type="string">discount</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="errors" xsi:type="array">
+                                            <item name="sortOrder" xsi:type="string">0</item>
+                                            <item name="component" xsi:type="string">Magento_SalesRule/js/view/payment/discount-messages</item>
+                                            <item name="displayArea" xsi:type="string">messages</item>
+                                        </item>
+                                    </item>
+                                </item>
+
+                                <item name="order-comment" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/order-comment</item>
+                                    <item name="displayArea" xsi:type="string">order-comment</item>
+                                </item>
+
+                                <item name="giftOptionsCart" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/gift-message</item>
+                                    <item name="displayArea" xsi:type="string">gift-message</item>
+                                    <item name="config" xsi:type="array">
+                                        <item name="template" xsi:type="string">Magestore_OneStepCheckout/gift-message</item>
+                                        <item name="formTemplate" xsi:type="string">Magestore_OneStepCheckout/gift-message-form</item>
+                                    </item>
+                                </item>
+
+                                <item name="sign-up-newsletter" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/sign-up-newsletter</item>
+                                    <item name="displayArea" xsi:type="string">sign-up-newsletter</item>
+                                </item>
+
+                                <item name="gift-wrap" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/gift-wrap</item>
+                                    <item name="displayArea" xsi:type="string">gift-wrap</item>
+                                </item>
+                            </item>
+                        </item>
+                        <item name="checkoutProvider" xsi:type="array">
+                            <item name="component" xsi:type="string">uiComponent</item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

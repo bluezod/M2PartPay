@@ -1,0 +1,29 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+<div class="billing-address-form" data-bind="fadeVisible: isAddressFormVisible">
+    <!-- ko foreach: getRegion('before-fields') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+    <form data-hasrequired="* Required Fields">
+        <fieldset id="billing-new-address-form" class="fieldset address">
+            <!-- ko foreach: getRegion('additional-fieldsets') -->
+                <!-- ko if:$parent.sortFields($data) -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            <!--/ko-->
+            <!-- ko if: (isCustomerLoggedIn && customerHasAddresses) -->
+            <div class="choice field">
+                <input type="checkbox" class="checkbox" id="billing-save-in-address-book" data-bind="checked: saveInAddressBook" />
+                <label class="label" for="billing-save-in-address-book">
+                    <span data-bind="i18n: 'Save in address book'"></span>
+                </label>
+            </div>
+            <!-- /ko -->
+            <div data-bind="afterRender:initGoogleAddress"></div>
+        </fieldset>
+    </form>
+</div>

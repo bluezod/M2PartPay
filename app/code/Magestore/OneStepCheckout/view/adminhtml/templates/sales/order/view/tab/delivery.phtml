@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * *
+ *  Copyright © 2016 Magestore. All rights reserved.
+ *  See COPYING.txt for license details.
+ *  
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magestore\OneStepCheckout\Block\Adminhtml\Sales\Order\View\Tab\Information $block */
+$delivery = $block->getDelivery();
+?>
+<?php if($this->getLastItem()) {?>
+	<?php echo "</table>"; ?>
+<?php if($delivery->getId()):?>
+<div class="entry-edit">
+	<fieldset>	
+	<div class="delivery">
+		<div class="entry-edit-head">
+			<h4 class="icon-head head-account">
+				<?php echo __('Time of Delivery') ?>
+			</h4>								
+		</div>
+	</div>
+	<div class="grid">
+		<div class="hor-scroll">
+			<table cellspacing="0" class="data">
+				<tbody>					
+					<tr class="odd">
+						
+						<td class="a-left" style="height:35px;line-height:35px;font-weight:bold;padding-left:10px;">
+							<p><?php echo $delivery->getDeliveryTimeDate();?></p>
+							<p><?php echo $delivery->getOscSecurityCode();?></p>
+						</td>						
+					</tr>														
+													
+				</tbody>
+			</table>
+		</div>
+	</div>
+	</fieldset>
+</div>
+<?php endif;?>
+<?php } ?>

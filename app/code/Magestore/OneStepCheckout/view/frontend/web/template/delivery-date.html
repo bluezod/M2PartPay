@@ -1,0 +1,49 @@
+<!--
+  ~ /**
+  ~  Copyright © 2016 Magestore. All rights reserved.
+  ~  See COPYING.txt for license details.
+  ~  */
+  -->
+
+<!-- ko if: isShowDelivery() -->
+<li class="delivery">
+    <div class="delivery_time_date">
+        <label for="delivery_date" data-bind="i18n: 'Date to delivery:'"></label>
+        <p class="datetime-delivery">
+            <input readonly="readonly" id="delivery_date" class="osc-additional-data"
+                   type="text" size="17" name="delivery[onestepcheckout-date]"
+                   data-bind="value: currentDate(),afterRender: initDate()"/>
+        </p>
+    </div>
+    <!-- ko if: listTime() -->
+    <div class="delivery_time_date select-time">
+        <label for="delivery_time" data-bind="i18n: 'Time to delivery:'"></label>
+        <p class="datetime-delivery">
+            <select id="delivery_time" style="width: 100px"
+                    data-bind="options: listTime(),
+                        optionsText: function(item) {
+                            return item
+                        },
+                        optionsValue: function(item) {
+                            return item
+                        },
+                        optionsCaption: $t('Choose...')">
+            </select>
+        </p>
+
+    </div>
+    <!-- /ko -->
+</li>
+<!-- /ko -->
+<!-- ko if: isShowSecurityCode() -->
+<li class="sercurity-box">
+    <div class="input-box">
+    <input id="security_code" class="osc-additional-data input-text"
+           type="text" size="25" name="security_code" style="margin-left: 20px" required />
+    <span class="highlight"></span>
+    <span class="bar"></span>
+    <label class="label" for="security_code" data-bind="i18n: 'Security access code (Buildings/gated communities)'"
+           style="margin-left: 20px;"></label>
+        </div>
+</li>
+<!-- /ko -->

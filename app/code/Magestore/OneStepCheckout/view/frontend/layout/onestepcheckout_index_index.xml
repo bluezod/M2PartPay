@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Magestore
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Magestore.com license that is
+ * available through the world-wide-web at this URL:
+ * http://www.magestore.com/license-agreement.html
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Magestore
+ * @package     Magestore_OneStepCheckout
+ * @copyright   Copyright (c) 2012 Magestore (http://www.magestore.com/)
+ * @license     http://www.magestore.com/license-agreement.html
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="1column">
+    <head>
+        <title>One Step Checkout</title>
+        <css src="Magestore_OneStepCheckout::css/theme/material/onestepcheckout.css"/>
+    </head>
+    <referenceBlock name="page.main.title" remove="true"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magestore\OneStepCheckout\Block\OneStep" name="onestepcheckout">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="payment" xsi:type="array">
+                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment</item>
+                            <item name="visible" xsi:type="boolean">true</item>
+                            <item name="config" xsi:type="array">
+                                <item name="title" xsi:type="string" translate="true">Payment</item>
+                            </item>
+                            <item name="children" xsi:type="array">
+                                <item name="renders" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="children" xsi:type="array">
+                                        <!-- merge payment method renders here -->
+                                        <item name="braintree-payments" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/braintree-methods</item>
+                                            <item name="methods" xsi:type="array">
+                                                <item name="braintree" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="braintree_paypal" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">false</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="authorizenet" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/authorizenet</item>
+                                            <item name="methods" xsi:type="array">
+                                                <item name="authorizenet_directpost" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="offline-payments" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/offline-payments</item>
+                                            <item name="methods" xsi:type="array">
+                                                <item name="checkmo" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="banktransfer" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="cashondelivery" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="purchaseorder" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="free-payments" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/payments</item>
+                                            <item name="methods" xsi:type="array">
+                                                <item name="free" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="paypal-payments" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/paypal-payments</item>
+                                            <item name="methods" xsi:type="array">
+                                                <item name="payflowpro" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="payflow_link" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="payflow_advanced" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="hosted_pro" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="paypal_billing_agreement" xsi:type="array">
+                                                    <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="additional-payment-validators" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="children" xsi:type="array">
+                                        <!-- merge payment validators here -->
+                                        <item name="email-validator" xsi:type="array">
+                                            <item name="component" xsi:type="string">Magento_Checkout/js/view/payment/email-validator</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="customer-email" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magento_Checkout/js/view/form/element/email</item>
+                                    <item name="displayArea" xsi:type="string">customer-email</item>
+                                    <item name="tooltip" xsi:type="array">
+                                        <item name="description" xsi:type="string" translate="true">We'll send your order confirmation here.</item>
+                                    </item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="before-login-form" xsi:type="array">
+                                            <item name="component" xsi:type="string">uiComponent</item>
+                                            <item name="displayArea" xsi:type="string">before-login-form</item>
+                                            <item name="children" xsi:type="array">
+                                                <!-- before login form fields -->
+                                            </item>
+                                        </item>
+                                        <item name="additional-login-form-fields" xsi:type="array">
+                                            <item name="component" xsi:type="string">uiComponent</item>
+                                            <item name="displayArea" xsi:type="string">additional-login-form-fields</item>
+                                            <item name="children" xsi:type="array">
+                                                <!-- additional login form fields -->
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="beforeMethods" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="displayArea" xsi:type="string">beforeMethods</item>
+                                    <item name="children" xsi:type="array">
+                                        <!-- merge additional data before payment methods here -->
+                                    </item>
+                                    <item name="validation" xsi:type="array">
+                                        <item name="validate-select" xsi:type="string">true</item>
+                                    </item>
+                                    <!-- Value of region_id field is filtered by the value of county_id attribute -->
+                                    <item name="filterBy" xsi:type="array">
+                                        <item name="target" xsi:type="string">${ $.provider }:${ $.parentScope }.country_id</item>
+                                        <item name="field" xsi:type="string">country_id</item>
+                                    </item>
+                                </item>
+                                <item name="payments-list" xsi:type="array">
+                                    <item name="component" xsi:type="string">Magestore_OneStepCheckout/js/view/payment/list</item>
+                                    <item name="displayArea" xsi:type="string">payment-methods-list</item>
+                                </item>
+                                <!-- merge your payment methods here -->
+                                <item name="afterMethods" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="displayArea" xsi:type="string">afterMethods</item>
+                                    <item name="children" xsi:type="array">
+                                        <!-- merge additional data after payment methods here -->
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+                </arguments>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Style" as="onestepcheckout.style"
+                       name="onestepcheckout_style"/>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Billing" as="onestepcheckout.billing"
+                       name="onestepcheckout_billing"/>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Shipping" as="onestepcheckout.shipping"
+                       name="onestepcheckout_shipping"/>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Shipping\Method"
+                       as="onestepcheckout.shipping_method" name="onestepcheckout_shipping_method">
+                    <block class="Magestore\OneStepCheckout\Block\OneStep\Shipping\Method\Available"
+                           as="onestepcheckout.shipping_method_available"
+                           name="onestepcheckout_shipping_method_available"/>
+                </block>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Payment" as="onestepcheckout.payment_method"
+                       name="onestepcheckout_payment_method"/>
+                <block class="Magestore\OneStepCheckout\Block\OneStep\Review" as="onestepcheckout.review"
+                       name="onestepcheckout.onestepcheckout.review">
+                    <block class="Magento\CheckoutAgreements\Block\Agreements" as="agreements"
+                           name="onestepcheckout.onestepcheckout.agreements"
+                           template="Magento_OneStepCheckout::agreements.phtml"/>
+                    <block class="Magestore\OneStepCheckout\Block\OneStep\Review\Info"
+                           template="Magestore_OneStepCheckout::review/info.phtml" as="info" name="review_info">
+                        <block class="Magestore\OneStepCheckout\Block\OneStep\Review\Item\Price\Renderer"
+                               name="checkout.onepage.review.item.price.unit.excl"
+                               template="Magestore_OneStepCheckout::review/item/price/unit_excl_tax.phtml"/>
+                        <block class="Magestore\OneStepCheckout\Block\OneStep\Review\Item\Price\Renderer"
+                               name="checkout.onepage.review.item.price.unit.incl"
+                               template="Magestore_OneStepCheckout::review/item/price/unit_incl_tax.phtml"/>
+                        <block class="Magestore\OneStepCheckout\Block\OneStep\Review\Item\Price\Renderer"
+                               name="checkout.onepage.review.item.price.rowtotal.excl"
+                               template="Magestore_OneStepCheckout::review/item/price/row_excl_tax.phtml"/>
+                        <block class="Magestore\OneStepCheckout\Block\OneStep\Review\Item\Price\Renderer"
+                               name="checkout.onepage.review.item.price.rowtotal.incl"
+                               template="Magestore_OneStepCheckout::review/item/price/row_incl_tax.phtml"/>
+                        <block class="Magento\Framework\View\Element\RendererList"
+                               name="checkout.onepage.review.item.renderers" as="renderer.list">
+                            <block class="Magento\Checkout\Block\Cart\Item\Renderer"
+                                   as="default" template="Magestore_OneStepCheckout::review/item.phtml"/>
+                            <block class="Magento\ConfigurableProduct\Block\Cart\Item\Renderer\Configurable"
+                                   as="configurable" template="Magestore_OneStepCheckout::review/item.phtml"
+                                   cacheable="false"/>
+                            <block class="Magento\Bundle\Block\Checkout\Cart\Item\Renderer"
+                                   as="bundle" template="Magestore_OneStepCheckout::review/item.phtml"/>
+                            <block class="Magento\Downloadable\Block\Checkout\Cart\Item\Renderer"
+                                   as="downloadable" template="Magestore_OneStepCheckout::review/item.phtml"/>
+                            <block class="Magento\GroupedProduct\Block\Cart\Item\Renderer\Grouped"
+                                   as="grouped" template="Magestore_OneStepCheckout::review/item.phtml"/>
+                        </block>
+
+                        <block class="Magento\Checkout\Block\Cart\Totals" name="osc_totals" as="osc.totals"
+                               template="Magestore_OneStepCheckout::review/totals.phtml"/>
+                    </block>
+                </block>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block class="Magestore\OneStepCheckout\Block\OneStep\Login" after="-" name="osc.login"/>
+        </referenceContainer>
+    </body>
+</page>

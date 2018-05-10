@@ -1,0 +1,30 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+
+	<head>
+        <title>Titlename</title>
+        <!-- 
+		demo
+		<css src="MR_PartPay::css/css.css"/>
+		<script src="MR_PartPay::js/js.js"/>
+		<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+		<script src="path/file.js" defer="defer"/>
+		<link src="http://url.com" src_type="url"/>
+		<remove src="path/remove/file.css"/>
+
+		-->
+    </head> 
+
+    <body>
+
+
+        <referenceContainer name="sidebar.main">
+            <block class="MR\PartPay\Block\Index\Sidebar" name="partpay_index_sidebar" before="-" template="MR_PartPay::partpay_index_sidebar.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <block class="MR\PartPay\Block\Index\Index" name="partpay_index_index" template="MR_PartPay::partpay_index_index.phtml"/>
+        </referenceContainer>
+
+
+    </body>
+</page>

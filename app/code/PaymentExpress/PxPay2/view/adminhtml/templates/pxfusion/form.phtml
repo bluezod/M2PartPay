@@ -1,0 +1,318 @@
+<?php
+// @codingStandardsIgnoreFile
+/**
+ *
+ * @var \PaymentExpress\PxPay2\Block\Adminhtml\Form $block
+ */
+$code = $block->escapeHtml($block->getMethodCode());
+$expiryMonth = $block->getData('expiry_month');
+$expiryYear = $block->getData('expiry_year');
+$serviceUrl = $block->getServiceUrl();
+?>
+
+<iframe id="paymentexpress-pxfusion-redirect-iframe"
+	allowtransparency="true" frameborder="0"
+	name="paymentexpress-pxfusion-redirect-iframe"
+	style="display: none; width: 100%; background-color: transparent"
+	src="<?php echo $block->escapeUrl($block->getViewFileUrl('blank.html')); ?>">
+</iframe>
+
+<div id="<?php /* @noEscape */ echo $code; ?>_container">
+    <fieldset class="admin__fieldset payment-method"
+    	id="payment_form_<?php /* @noEscape */ echo $code; ?>"
+    	style="display: none">
+    
+    	<div class="field-number admin__field _required">
+    		<label class="admin__field-label"
+    			for="<?php /* @noEscape */ echo $code; ?>_card_number"> <span><?php echo $block->escapeHtml(__('Card Number')); ?></span>
+    		</label>
+    		<div class="admin__field-control">
+    			<input type="text"
+    				id="<?php /* @noEscape */ echo $code; ?>_card_number"
+    				name="payment[card_number]"
+    				title="<?php echo $block->escapeHtml(__('Card Number')); ?>"
+    				class="admin__control-text validate-cc-number"
+    				value="" />
+    		</div>
+    	</div>
+    
+    	<div class="field-number admin__field _required">
+    		<label class="admin__field-label"
+    			for="<?php /* @noEscape */ echo $code; ?>_card_holder_name"> <span><?php echo $block->escapeHtml(__('Card Holder Name')); ?></span>
+    		</label>
+    		<div class="admin__field-control required-entry">
+    			<input type="text"
+    				id="<?php /* @noEscape */ echo $code; ?>_card_holder_name"
+    				name="payment[card_holder_name]"
+    				title="<?php echo $block->escapeHtml(__('Card Holder Name')); ?>"
+    				class="admin__control-text"
+    				value="" />
+    		</div>
+    	</div>
+    
+    	<div class="field-date admin__field _required">
+    		<label class="admin__field-label"
+    			for="<?php /* @noEscape */ echo $code; ?>_expiration_month"> <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
+    		</label>
+    		<div class="admin__field-control">
+    			<select id="<?php /* @noEscape */ echo $code ?>_expiration_month"
+    				name="payment[expiration_month]"
+    				class="admin__control-select admin__control-select-month validate-cc-exp required-entry">
+                    <?php foreach ($block->getExpiryMonths() as $k => $v): ?>
+                        <option
+    					value="<?php echo $block->escapeHtml($k); ?>"
+    					<?php if ($k == $expiryMonth): ?> selected="selected"
+    					<?php endif ?>>
+                            <?php echo $block->escapeHtml($v); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select> <select
+    				id="<?php /* @noEscape */ echo $code ?>_expiration_year"
+    				name="payment[expiration_year]"
+    				class="admin__control-select admin__control-select-year required-entry">
+                    <?php foreach ($block->getExpiryYears() as $k => $v): ?>
+                        <option
+    					value="<?php /* @noEscape */ echo $k ? $block->escapeHtml($k) : '' ?>"
+    					<?php if ($k == $expiryYear): ?> selected="selected" <?php endif ?>>
+                            <?php echo $block->escapeHtml($v); ?>
+                        </option>
+                    <?php endforeach ?>
+                </select>
+    		</div>
+    	</div>
+    
+    	<div class="field-number required admin__field _required">
+    		<label class="admin__field-label"
+    			for="<?php /* @noEscape */ echo $code; ?>_cvc"> <span><?php echo $block->escapeHtml(__('Card Verification Number')); ?></span>
+    		</label>
+    		<div class="admin__field-control">
+    			<input type="text"
+    				title="<?php echo $block->escapeHtml(__('Card Verification Number')); ?>"
+    				class="required-entry validate-cc-cvn admin__control-cvn admin__control-text"
+    				id="<?php /* @noEscape */ echo $code; ?>_cvc" name="payment[cvc]"
+    				value="" />
+    		</div>
+    	</div>
+    </fieldset>
+
+</div>
+
+<script>
+    /** Post the credit card information to DPS after order created.
+    Magento::Sales\view\adminhtml\web\order\create\script.js
+                jQuery('#edit_form')
+                .on('submitOrder', function(){
+                    jQuery(this).trigger('realOrder');
+                })
+                .on('realOrder', this._realSubmit.bind(this));
+                
+                // In realSubmit: jQuery('#edit_form').triggerHandler('save');
+                
+     Magento::Sales\view\adminhtml\web\order\create\form.js
+         order = new AdminOrder(config);
+         window.order = order;
+                
+    */
+   
+    // TODO: move the js to a separate file. bad practice to put js in phtml.
+    
+    function pxfusionHack(){
+       var paymentIframeId = "paymentexpress-pxfusion-redirect-iframe";
+        
+        var serviceUrl = "<?php echo $serviceUrl; ?>";
+        var pxfusion = "<?php echo $code; ?>";
+        var pxfusionContainerId = "#" + pxfusion + "_container";
+        
+
+        window.paymentexpress = window.paymentexpress || {};
+        window.paymentexpress.pxfusion = window.paymentexpress.pxfusion || {};
+        if (window.paymentexpress.pxfusion.injected){
+            return;
+        }
+        
+        var waitingForPxFusionResponse = false;
+
+        // hack getPaymentData
+        window.order.addExcludedPaymentMethod(pxfusion); // ensure the payment data is not sent to merchant server.
+
+        var originalRealSubmit = window.order._realSubmit;
+        
+        _realPxFusionHook = function(){
+            if (window.order.paymentMethod === pxfusion){
+                submitOrderWithPxFusion();
+                return;
+            }
+            return window.order._realSubmit();
+        }
+        jQuery('#edit_form').off('realOrder')
+                            .on('realOrder', _realPxFusionHook);
+
+        window.paymentexpress.pxfusion.injected = true;
+        function onLoadPaymentIframe(){
+            if (!waitingForPxFusionResponse){
+                return;
+            }
+            
+            waitingForPxFusionResponse = false;
+            
+            var responseElement = $(paymentIframeId).contentWindow.document.body.getElementsByTagName('pre')[0];
+            var html = responseElement.innerHTML;
+            handlePxFusionResult(html);
+            responseElement.remove();
+       };
+       
+       function displayPxFusionError(error){
+            var fieldsetId = "#payment_form_" + pxfusion;
+            var errorLabel = jQuery("<label>").text(error).attr({class:"mage-error"});
+            
+            
+            enableElements('save');
+            jQuery('#edit_form').trigger('processStop');
+            jQuery('#edit_form').off('invalid-form.validate');
+            errorLabel.insertBefore(fieldsetId);
+       }
+       
+       function handlePxFusionResult(html){
+            var data = JSON.parse(html);
+            if (data.Success){
+                jQuery(pxfusionContainerId).remove();
+                jQuery('#edit_form').triggerHandler('save');
+            }
+            else{
+                displayPxFusionError(data.Error);
+            }
+       }
+       
+       // onLoadPaymentIframe is NOT invoked when iframe updated by fusion respone. The reason is unknown. Hack here...
+       // Remove the hack if the root cause has been found.
+       function mointerPxFusionResult(){
+            if (!waitingForPxFusionResponse){
+                return;
+            }
+            
+            var responseElement = $(paymentIframeId).contentWindow.document.body.getElementsByTagName('pre');
+            var jsonResponse = "";
+            if (responseElement && responseElement.length){
+                jsonResponse = responseElement[0].innerHTML;
+            }
+            if (jsonResponse){
+                handlePxFusionResult(jsonResponse);
+                responseElement[0].remove();
+            }
+            else{
+                setTimeout(mointerPxFusionResult, 100); // Check whether response is received 100ms later.
+            }
+       }
+
+       jQuery(paymentIframeId).load(onLoadPaymentIframe.bindAsEventListener(this));
+       function submitOrderWithPxFusion(){
+            var disableAndSave = function() {
+                disableElements('save');
+                jQuery('#edit_form').on('invalid-form.validate', function() {
+                    enableElements('save');
+                    jQuery('#edit_form').trigger('processStop');
+                    jQuery('#edit_form').off('invalid-form.validate');
+                });
+                var validator =jQuery.data(jQuery("#edit_form")[0], 'validator');
+                if (validator.form())
+                    sendPaymentRequest();
+            }
+            if (this.orderItemChanged) {
+                var self = this;
+
+                jQuery('#edit_form').trigger('processStop');
+
+                confirm({
+                    content: jQuery.mage.__('You have item changes'),
+                    actions: {
+                        confirm: function() {
+                            jQuery('#edit_form').trigger('processStart');
+                            disableAndSave();
+                        },
+                        cancel: function() {
+                            self.itemsUpdate();
+                        }
+                    }
+                });
+            } else {
+                disableAndSave();
+            }
+       }
+
+       function sendPaymentRequest(){
+            console.log("sendPaymentRequest:");
+            new Ajax.Request(serviceUrl, {
+                method: 'Post',
+                contentType: "application/x-www-form-urlencoded;charset=utf-8",
+                onSuccess : function(response) {
+                    var postUrl = response.responseJSON.PostUrl;
+                    var sessionId = response.responseJSON.TransactionId;
+                    
+                    if (!sessionId){ // defensive code. should not happen when configuration is correct.
+                        displayPxFusionError("Critical Error: Failed to create transaction!");
+                        return;
+                    }
+                    
+                    var postData = {"url":response.responseJSON.PostUrl, "SessionId": sessionId};
+                    jQuery.extend(postData, getCardInformation());
+                    submitPaymentForm(postData);
+
+                    waitingForPxFusionResponse = true;
+                    mointerPxFusionResult();
+                }.bind(this)
+            });
+       }
+       
+        function getCardInformation(){
+            return {
+                CardNumber : jQuery("#" + pxfusion + "_card_number").val(),
+                CardHolderName : jQuery("#" + pxfusion + "_card_holder_name").val(),
+                ExpiryMonth: jQuery("#" + pxfusion + "_expiration_month").val(),
+                ExpiryYear: jQuery("#" + pxfusion + "_expiration_year").val(),
+                Cvc2: jQuery("#" + pxfusion + "_cvc").val(),
+            };
+        }
+    
+        function submitPaymentForm(postData){
+            // Post pxfusion data in iframe.
+            var postUrl = postData.url;
+            
+            // http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
+            // create a form to submit. is it any better way?
+            var form = jQuery("<form></form>");
+            jQuery(form).attr("action", postUrl);
+            jQuery(form).attr("method", "POST");
+            jQuery(form).attr("target", paymentIframeId);
+
+            for (var name in postData){
+                if (name == "url"){
+                    continue;
+                }
+                var value = postData[name];
+                form.append(createHiddenElement(name, value));
+            }
+            // must add a submit button in the form, other not submit in Firefox.
+            // http://stackoverflow.com/questions/31265218/cannot-submit-form-from-javascript-on-firefox
+            var submitButton = jQuery("<button>").attr("type", "submit").attr(
+                    "name", "ClickMe").val("Click Me");
+            form.append(submitButton);
+            
+            form.appendTo('body');
+            form.submit();
+            
+            return;
+        }
+        
+        function createHiddenElement(name, value) {
+            var field = document.createElement('input');
+            field.type = 'hidden';
+            field.name = name;
+            field.value = value;
+            return jQuery(field);
+        }
+        
+    };
+    
+    require(['mage/validation', 'Magento_Sales/order/create/form'], pxfusionHack);
+    
+</script>

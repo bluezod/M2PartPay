@@ -1,0 +1,52 @@
+<!-- @var $block \PaymentExpress\PxPay2\Block\Customer\Cards -->
+
+<?php if(sizeof($block->getCards()) > 0): ?>
+<table class="data-table orders" id="my-saved-cards-table">
+	<thead>
+		<tr>
+			<th><?php echo __("Card Number") ?></th>
+			<th><?php echo __("Expiry Date") ?></th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+            <?php foreach ($block->getCards() as $item): ?>
+                <tr>
+			<td class="col"><?php echo htmlentities($item["CardNumber"]) ?></td>
+			<td class="col"><?php echo htmlentities($item["ExpiryDate"]) ?></td>
+
+			<td class="col a-center view"><a href="<?php echo $block->escapeUrl($item["DeleteUrl"]) ?>" onclick="return pxDeleteCardConfirmation(this);"><?php echo __("Delete") ?></a>
+			</td>
+		</tr>
+            <?php endforeach; ?>
+	</tbody>
+</table>
+
+<script>
+require([
+    'jquery',
+    'Magento_Ui/js/modal/confirm'
+], function(jQuery, confirm){
+
+    function pxDeleteCardConfirmation(obj) {
+        confirm({
+            content:  "<?php echo __("Are you sure you want to remove this card?") ?>",
+            actions: {
+                confirm: function() {
+                    var url = jQuery(obj).attr("href");
+                    jQuery.mage.redirect(url);
+                },
+                cancel: function() {
+                }
+            }
+        });
+        return false;
+    };
+
+    window.pxDeleteCardConfirmation = pxDeleteCardConfirmation;
+});
+</script>
+
+<?php else: ?>
+    <div  class="message info empty"><span><?php echo __("You have not saved any cards") ?></span></div>
+<?php endif; ?>

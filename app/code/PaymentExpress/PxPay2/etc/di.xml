@@ -1,0 +1,18 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="PaymentExpress\PxPay2\Logger\DpsLogger">
+		<arguments>
+			<argument name="name" xsi:type="string">PaymentExpress</argument>
+			<argument name="handlers" xsi:type="array">
+				<item name="system" xsi:type="object">PaymentExpress\PxPay2\Logger\Handler\All</item>
+			</argument>
+		</arguments>
+	</type>
+	
+    <preference for="PaymentExpress\PxPay2\Api\PxFusionManagementInterface" type="PaymentExpress\PxPay2\Model\Api\PxFusionManagement" />
+    <preference for="PaymentExpress\PxPay2\Api\GuestPxFusionManagementInterface" type="PaymentExpress\PxPay2\Model\Api\GuestPxFusionManagement" />
+    
+    <preference for="PaymentExpress\PxPay2\Api\PxPayManagementInterface" type="PaymentExpress\PxPay2\Model\Api\PxPayManagement" />
+    <preference for="PaymentExpress\PxPay2\Api\GuestPxPayManagementInterface" type="PaymentExpress\PxPay2\Model\Api\GuestPxPayManagement" />
+
+</config>

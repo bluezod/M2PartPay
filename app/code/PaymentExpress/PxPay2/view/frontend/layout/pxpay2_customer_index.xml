@@ -1,0 +1,14 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<update handle="customer_account" />
+	<body>
+		<referenceBlock name="head.components">
+			<block class="Magento\Framework\View\Element\Js\Components"
+				name="paymentexpress_cards_head_components" template="PaymentExpress_PxPay2::js/components.phtml" />
+		</referenceBlock>
+		<referenceContainer name="content">
+			<block class="PaymentExpress\PxPay2\Block\Customer\Cards" name="paymentexpress_cards"
+				template="customer/cards.phtml" cacheable="false" />
+		</referenceContainer>
+	</body>
+</page>

@@ -1,0 +1,120 @@
+<div class="payment-method"
+	data-bind="css: {'_active': (getCode() == isChecked())}">
+	<div class="payment-method-title field choice">
+		<input type="radio" name="payment[method]" class="radio"
+			data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+		<label data-bind="attr: {'for': getCode()}" class="label"> <!-- Logo -->
+			<img height="39" width="163"
+			data-bind="attr: {src: payemntExpressLogo}" class="payment-icon" />
+			<!-- Logo --> <span data-bind="text: getTitle()"></span>
+		</label>
+	</div>
+	<div class="payment-method-content">
+		<div class="payment-method-billing-address">
+			<!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+			<!-- ko template: getTemplate() -->
+			<!-- /ko -->
+			<!--/ko-->
+		</div>
+		<div class="checkout-agreements-block">
+			<!-- ko foreach: $parent.getRegion('before-place-order') -->
+			<!-- ko template: getTemplate() -->
+			<!-- /ko -->
+			<!--/ko-->
+		</div>
+
+		<div data-bind="if: showCardOptions">
+			<div data-bind="if: isRebillEnabled">
+				<div data-bind="if: contiansSavedCards">
+					<input type="radio"
+						class="radio" name="payment[paymentexpress_use_saved_card]"
+						id="paymentexpress_use_saved_card" value="withRebillToken"
+						data-bind="checked: paymentOption" />
+					<label for="paymentexpress_use_saved_card">Use one of the following saved payment details: </label>
+
+					<div style="padding-left: 2em;">
+						<div class="input-box">
+							<select name="payment[paymentexpress_rebilling_token]"
+								id="paymentexpress_rebilling_token" title="Saved Cards"
+								data-bind="enable: rebillingTokenEnabled, value:billingId">
+								<option value="">--Please Select--</option>
+								<!-- ko foreach: savedCards -->
+								<option data-bind="value: billing_token, text:card_info"></option>
+								<!--/ko-->
+
+							</select>
+						</div>
+					</div>
+
+					<div><input type="radio" class="radio"
+						id="paymentexpress_without_rebill_token"
+						value="withoutRebillToken" data-bind="checked: paymentOption" />
+						<label class="radio" for="paymentexpress_without_rebill_token">
+							Proceed without using any saved payment detail. </label></div>
+					<div class="dpsCheckboxIndent">
+						<input class="checkbox"
+						type="checkbox" id="paymentexpress_save_card_info"
+						name="payment[paymentexpress_save_card_info]"
+						data-bind="enable: addBillCardEnabled, checked: enableAddBillCard" />
+						<label for="paymentexpress_save_card_info"> Save your payment details for next time </label>
+					</div>
+				</div>
+
+				<div data-bind="ifnot: contiansSavedCards">
+					<div> Proceed without using any saved payment detail. </div>
+					<input class="checkbox" type="checkbox"
+						id="paymentexpress_save_card_info"
+						name="payment[paymentexpress_save_card_info]"
+						data-bind="enable: addBillCardEnabled, checked: enableAddBillCard" />
+					<label for="paymentexpress_save_card_info">Save your payment details for next time </label>
+				</div>
+			</div>
+
+			<div data-bind="ifnot: isRebillEnabled">Proceed without using any saved payment detail.</div>
+		</div>
+
+		<div class="form-alt" style="padding-top: 2em;">You will be redirected to the Payment Express website when you place an order.</div>
+
+
+		<!-- Merchant logos -->
+		<div>
+			<br>
+			<div data-bind="if: merchantLogos.length">
+				<!-- ko foreach: merchantLogos -->
+				<img data-bind="attr:{src:Url, alt:Alt, width:Width, height:Height}"
+					class="dpsMerchantLogos"></img>
+				<!--/ko-->
+			</div>
+
+			<div data-bind="if: merchantText">
+				<span data-bind="text:merchantText"></span>
+			</div>
+
+			<div data-bind="if: merchantLinkData.Url">
+				<a
+					data-bind="attr:{href:merchantLinkData.Url}, text:merchantLinkData.Text"
+					target="_blank"></a>
+			</div>
+
+			<br />
+		</div>
+		<!-- Merchant logos -->
+
+		<!-- PaymentInformationManagement::savePaymentInformationAndPlaceOrder -->
+		<!-- QuoteManagement::placeOrder -->
+		<!-- OrderService::place -->
+		<div class="actions-toolbar">
+			<div class="primary">
+				<button class="action primary checkout" type="submit"
+					data-bind="
+                        click: continueToPxPay,
+                        attr: {title: $t('Continue to PxPay')},
+                        enable: (getCode() == isChecked())
+                        "
+					disabled>
+					<span data-bind="i18n: 'Continue to PxPay'"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

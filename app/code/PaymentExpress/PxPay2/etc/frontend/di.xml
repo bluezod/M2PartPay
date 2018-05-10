@@ -1,0 +1,11 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Magento\Checkout\Model\CompositeConfigProvider">
+		<arguments>
+			<argument name="configProviders" xsi:type="array">
+				<item name="paymentexpress_pxpay2_pxfusion_config_provider" xsi:type="object">PaymentExpress\PxPay2\Model\PxFusion\ConfigProvider</item>
+				<item name="paymentexpress_pxpay2_config_provider" xsi:type="object">PaymentExpress\PxPay2\Model\PxPay2ConfigProvider</item>
+			</argument>
+		</arguments>
+	</type>
+</config>

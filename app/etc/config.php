@@ -143,6 +143,7 @@ return [
     'Magento_WishlistAnalytics' => 1,
     'Magento_WishlistSampleData' => 1,
     'Magestore_OneStepCheckout' => 1,
+    'PaymentExpress_PxPay2' => 1,
     'Shopial_Facebook' => 1,
     'Temando_Shipping' => 1,
     'Vertex_Tax' => 1

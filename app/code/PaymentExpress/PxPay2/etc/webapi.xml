@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Managing Guest Cart Payment -->
+    <route url="/V1/guest-carts/:cartId/pxfusion/selected-payment-method" method="PUT">
+        <service class="PaymentExpress\PxPay2\Api\GuestPxFusionManagementInterface" method="set"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    
+    
+    <route url="/V1/guest-carts/:cartId/pxpay2/selected-payment-method" method="PUT">
+        <service class="PaymentExpress\PxPay2\Api\GuestPxPayManagementInterface" method="set"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!-- Managing my Cart Payment -->
+    <route url="/V1/carts/mine/pxfusion/selected-payment-method" method="PUT">
+        <service class="PaymentExpress\PxPay2\Api\PxFusionManagementInterface" method="set"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/carts/mine/pxpay2/selected-payment-method" method="PUT">
+        <service class="PaymentExpress\PxPay2\Api\PxPayManagementInterface" method="set"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+</routes>

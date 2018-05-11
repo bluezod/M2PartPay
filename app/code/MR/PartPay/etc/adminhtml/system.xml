@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<section id="payment">
+			<group id="mr_partpay" translate="label" type="text"
+				sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+				<label>MR PartPay</label>
+				<field id="active" translate="label" type="select" sortOrder="100"
+					showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Enabled</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+
+				<field id="forcea2a" translate="label" type="select"
+					sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Account2Account Only</label>
+					<comment>Rebilling and Authorise Only cannot be enabled if
+						Account2Account only is set as payment method</comment>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+
+
+				<field id="pxPayUserId" translate="label" type="text"
+					sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPay UserId</label>
+				</field>
+
+				<field id="pxPayKey" translate="label" type="password"
+					sortOrder="700" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPay Key</label>
+				</field>
+
+				<field id="pxPayUrl" translate="label" type="text" sortOrder="800"
+					showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPay Url</label>
+				</field>
+
+				<field id="allowRebill" translate="label" type="select"
+					sortOrder="900" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Enable Rebill</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+
+				<field id="pxpostusername" translate="label" type="text"
+					sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPost Username</label>
+				</field>
+
+				<field id="pxpostpassword" translate="label" type="password"
+					sortOrder="1100" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPost Password</label>
+				</field>
+
+				<field id="pxposturl" translate="label" type="text" sortOrder="1200"
+					showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>PxPost Url</label>
+				</field>
+			</group>
+
+		</section>
+	</system>
+</config>

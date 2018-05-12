@@ -9,6 +9,7 @@ return [
     'Magento_Customer' => 1,
     'Magento_Indexer' => 1,
     'Magento_Theme' => 1,
+    'MR_PartPay' => 1,
     'Magento_Cms' => 1,
     'Magento_AdvancedPricingImportExport' => 1,
     'Magento_Config' => 1,

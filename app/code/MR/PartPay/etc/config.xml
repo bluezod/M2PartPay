@@ -1,0 +1,14 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<payment>
+			<mr_partpay>
+				<model>MR\PartPay\Model\Payment</model>
+				<active>1</active>
+				<title>PartPay</title>
+				<allowspecific>0</allowspecific>
+				<sort_order>20</sort_order>
+			</mr_partpay>
+		</payment>
+	</default>
+</config>

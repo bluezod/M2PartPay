@@ -147,19 +147,10 @@ class PaymentUtil extends AbstractHelper
         $amount = $order->getBaseGrandTotal();
         
         $additionalInfo = [];
-        $useSavedCard = false;
-        $dpsBillingId = "";
-        $enableAddBillCard = false;
         $quoteId = $order->getQuoteId();
         
         $payment = $order->getPayment();
         $additionalInfo = $payment->getAdditionalInformation();
-        
-        $useSavedCard = filter_var($additionalInfo["UseSavedCard"], FILTER_VALIDATE_BOOLEAN);
-        if ($useSavedCard) {
-            $dpsBillingId = $additionalInfo["DpsBillingId"];
-        }
-        $enableAddBillCard = $additionalInfo["EnableAddBillCard"];
         
         $dataBag = $this->_objectManager->create("\Magento\Framework\DataObject");
         $dataBag->setForceA2A(false);
@@ -177,8 +168,6 @@ class PaymentUtil extends AbstractHelper
         $dataBag->setTransactionType($transactionType);
         $dataBag->setOrderIncrementId($orderIncrementId);
         $dataBag->setOrderId($order->getId());
-        $dataBag->setDpsBillingId($dpsBillingId);
-        $dataBag->setEnableAddBillCard($enableAddBillCard);
         
         $customerInfo = $this->loadCustomerInfo($order);
         $dataBag->setCustomerInfo($customerInfo);
@@ -237,21 +226,6 @@ class PaymentUtil extends AbstractHelper
             ->addFieldToFilter('masked_card_number', $cardNumber)
             ->addFieldToFilter('cc_expiry_date', $expiryDate);
         $billingModelCollection->walk('delete');
-    }
-
-    public function getPaymentExpressLogoSrc(array $params = [])
-    {
-        $url = '';
-        $this->_logger->info(__METHOD__);
-        try {
-            $params = array_merge(['module' => $this->_getModuleName()], $params);
-            $url = $this->_assetRepo->getUrlWithParams('images/DpsLogo.png', $params);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->_logger->critical($e);
-            $url = '';
-        }
-        $this->_logger->info(__METHOD__ . " url: {$url}");
-        return $url;
     }
 
     public function findDpsTxnRefForRefund($info)

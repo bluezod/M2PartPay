@@ -46,7 +46,7 @@ class GuestPartPayManagement implements \MR\PartPay\Api\GuestPartPayManagementIn
     		\Magento\Quote\Api\GuestBillingAddressManagementInterface $billingAddressManagement
     ) {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->_apiHelper = $objectManager->get("\MR\PartPay\Model\Api\ApiPxPayHelper");
+        $this->_apiHelper = $objectManager->get("\MR\PartPay\Model\Api\ApiPartPayHelper");
         $this->_logger = $objectManager->get("\MR\PartPay\Logger\PartPayLogger");
         $this->_logger->info(__METHOD__);
         

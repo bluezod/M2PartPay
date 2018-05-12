@@ -28,7 +28,7 @@ class Communication extends AbstractHelper
     {
         parent::__construct($context);
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->_logger = $objectManager->get("\MR\PartPay\Logger\DpsLogger");
+        $this->_logger = $objectManager->get("\MR\PartPay\Logger\PartPayLogger");
         $this->_configuration = $objectManager->get("\MR\PartPay\Helper\Configuration");
         $this->_paymentUtil = $objectManager->get("\MR\PartPay\Helper\PaymentUtil");
         $this->_logger->info(__METHOD__);
@@ -108,13 +108,6 @@ class Communication extends AbstractHelper
                 $requestObject->addChild($name, substr($value, 0, $maxLength));
             }
         };
-        
-        $dpsBillingId = $requestData->getDpsBillingId();
-        if (!empty($dpsBillingId)) {
-            $requestObject->addChild("DpsBillingId", $dpsBillingId);
-        } else {
-            $addNonEmptyValue("EnableAddBillCard", $requestData->getEnableAddBillCard(), 1);
-        }
         
         // customer information:
         

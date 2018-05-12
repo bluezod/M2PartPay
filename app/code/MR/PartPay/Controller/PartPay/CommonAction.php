@@ -57,7 +57,7 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
     public function __construct(Context $context)
     {
         parent::__construct($context);
-        $this->_logger = $this->_objectManager->get("\MR\PartPay\Logger\DpsLogger");
+        $this->_logger = $this->_objectManager->get("\MR\PartPay\Logger\PartPayLogger");
         $this->_communication = $this->_objectManager->get("\MR\PartPay\Helper\Communication");
         $this->_configuration = $this->_objectManager->get("\MR\PartPay\Helper\Configuration");
         
@@ -257,11 +257,6 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
             $this->_logger->info(__METHOD__ . " placing order for logged in customer. quoteId:{$quoteId}");
             // create order, and redirect to success page.
             $orderId = $this->_quoteManagement->placeOrder($quoteId);
-
-            $enableAddBillCard =  filter_var($info["EnableAddBillCard"], FILTER_VALIDATE_BOOLEAN);
-            if ($enableAddBillCard){
-                $this->_saveRebillToken($payment, $orderId, $quote->getCustomerId(), $responseXmlElement);
-            }
         } else {
             // Guest:
             $cartId = $info["cartId"];
@@ -329,31 +324,10 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         
         unset($info["cartId"]);
         unset($info["guestEmail"]);
-        unset($info["UseSavedCard"]);
-        unset($info["DpsBillingId"]);
-        unset($info["EnableAddBillCard"]);
         unset($info["method_title"]);
 
         $this->_logger->info(__METHOD__ . " info: ".var_export($info, true));
         return $info;
-    }
-
-    private function _saveRebillToken($payment, $orderId, $customerId, $paymentResponseXmlElement)
-    {
-        $this->_logger->info(__METHOD__." orderId:{$orderId}, customerId:{$customerId}");
-        $storeManager = $this->_objectManager->get("\Magento\Store\Model\StoreManagerInterface");
-        $storeId = $storeManager->getStore()->getId();
-        $billingModel = $this->_objectManager->create("\PaymentExpress\PxPay2\Model\BillingToken");
-        $billingModel->setData(
-            array(
-                "customer_id" => $customerId,
-                "order_id" => $orderId,
-                "store_id" => $storeId,
-                "masked_card_number" => (string)$paymentResponseXmlElement->CardNumber,
-                "cc_expiry_date" => (string)$paymentResponseXmlElement->DateExpiry,
-                "dps_billing_id" => (string)$paymentResponseXmlElement->DpsBillingId
-            ));
-        $billingModel->save();
     }
 
     private function _savePaymentResult($pxpayUserId, $token, \Magento\Quote\Model\Quote $quote, 

@@ -42,30 +42,35 @@ class InstallSchema implements InstallSchemaInterface
                     'token',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'Token'
                 )
                 ->addColumn(
                     'url',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'URL'
                 )
                 ->addColumn(
                     'expire',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'Expire'
                 )
                 ->addColumn(
                     'order_id',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'Order ID'
                 )
                 ->addColumn(
                     'partpay_id',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'PartPay ID'
                 )
                 ->addIndex('token', 'token')
@@ -97,18 +102,21 @@ class InstallSchema implements InstallSchemaInterface
                     'store_id',
                     Table::TYPE_INTEGER,
                     11,
+                    [],
                     'Store ID'
                 )
                 ->addColumn(
                     'min',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'Min'
                 )
                 ->addColumn(
                     'max',
                     Table::TYPE_TEXT,
                     255,
+                    [],
                     'Max'
                 )
                 ->setComment('PartPay Configuration Table');

@@ -100,17 +100,6 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
         }
         
         $info = [];
-        $dpsBillingId = $source->getData("paymentexpress_billingId");
-        $info["UseSavedCard"] = filter_var($source->getData("paymentexpress_useSavedCard"), FILTER_VALIDATE_BOOLEAN);
-        $info["EnableAddBillCard"] = filter_var($source->getData("paymentexpress_enableAddBillCard"), FILTER_VALIDATE_BOOLEAN);
-        if (isset($dpsBillingId) && !empty($dpsBillingId)) {
-            $info["DpsBillingId"] = $dpsBillingId;
-            $info["UseSavedCard"] = true;
-            
-            $info["EnableAddBillCard"] = false; // Do not add billing token when rebill.
-        } else {
-            $info["UseSavedCard"] = false;
-        }
         $info["cartId"] = $source->getData("cartId");
         $info["guestEmail"] = $source->getData("guestEmail");
         

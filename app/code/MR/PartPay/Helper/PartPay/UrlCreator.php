@@ -88,18 +88,9 @@ class UrlCreator
         $amount = $quote->getBaseGrandTotal();
         
         $additionalInfo = [];
-        $useSavedCard = false;
-        $dpsBillingId = "";
-        $enableAddBillCard = false;
         
         $payment = $quote->getPayment();
         $additionalInfo = $payment->getAdditionalInformation();
-        
-        $useSavedCard = filter_var($additionalInfo["UseSavedCard"], FILTER_VALIDATE_BOOLEAN);
-        if ($useSavedCard) {
-            $dpsBillingId = $additionalInfo["DpsBillingId"];
-        }
-        $enableAddBillCard = $additionalInfo["EnableAddBillCard"];
         
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $dataBag = $objectManager->create("\Magento\Framework\DataObject");
@@ -121,8 +112,6 @@ class UrlCreator
         $dataBag->setTransactionType($transactionType);
         $dataBag->setOrderIncrementId($orderIncrementId);
         $dataBag->setQuoteId($quote->getId());
-        $dataBag->setDpsBillingId($dpsBillingId);
-        $dataBag->setEnableAddBillCard($enableAddBillCard);
         
         $customerInfo = $this->_loadCustomerInfo($quote);
         $dataBag->setCustomerInfo($customerInfo);

@@ -53,7 +53,6 @@ class PartPayConfigProvider implements ConfigProviderInterface
                     'redirectUrl' => $paymentUtil->buildRedirectUrl($quoteId),
                     'isRebillEnabled' => $isRebillEnabled,
                     'showCardOptions' => $showCardOptions,
-                    'payemntExpressLogo' => $paymentUtil->getPaymentExpressLogoSrc(),
                     'method' => \MR\PartPay\Model\Payment::MR_PARTPAY_CODE
                 ]
             ]

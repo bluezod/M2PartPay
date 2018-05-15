@@ -32,17 +32,17 @@ class Configuration extends AbstractHelper
         return "M2-" . $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
     }
 
-    public function getPxPayUserId($storeId = null)
+    public function getPartPayUserId($storeId = null)
     {
         return $this->_getPartPayStoreConfig("pxPayUserId", $storeId);
     }
 
-    public function getPxPayKey($storeId = null)
+    public function getPartPayKey($storeId = null)
     {
         return $this->_getPartPayStoreConfig("pxPayKey", $storeId, true);
     }
 
-    public function getPxPayUrl($storeId = null)
+    public function getPartPayUrl($storeId = null)
     {
         return $this->_getPartPayStoreConfig("pxPayUrl", $storeId);
     }

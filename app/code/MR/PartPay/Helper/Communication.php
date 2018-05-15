@@ -34,11 +34,11 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__);
     }
 
-    public function getPxPay2Page($requestData, $storeId = null)
+    public function getPartPayPage($requestData, $storeId = null)
     {
         $this->_logger->info(__METHOD__);
-        $requestXml = $this->_buildPxPay2Request($requestData);
-        $url = $this->_configuration->getPxPayUrl($storeId);
+        $requestXml = $this->_buildPartPayRequest($requestData);
+        $url = $this->_configuration->getPartPayUrl($storeId);
         return $this->_sendRequest($requestXml, $url);
     }
 
@@ -47,7 +47,7 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} storeId:{$storeId}");
         $requestXml = $this->_buildProcessResponseRequest($userId, $token);
         
-        $pxPayUrl = $this->_configuration->getPxPayUrl($storeId);
+        $pxPayUrl = $this->_configuration->getPartPayUrl($storeId);
         $responseXml = $this->_sendRequest($requestXml, $pxPayUrl);
         
         $this->_logger->info(__METHOD__ . " responseXml:" . $responseXml);
@@ -73,11 +73,11 @@ class Communication extends AbstractHelper
     }
     
     // Private function below
-    private function _buildPxPay2Request($requestData, $storeId = null)
+    private function _buildPartPayRequest($requestData, $storeId = null)
     {
         $this->_logger->info(__METHOD__);
-        $userId = $this->_configuration->getPxPayUserId($storeId);
-        $pxPayKey = $this->_configuration->getPxPayKey($storeId);
+        $userId = $this->_configuration->getPartPayUserId($storeId);
+        $partPayKey = $this->_configuration->getPartPayKey($storeId);
         
         $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
         $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
@@ -88,7 +88,7 @@ class Communication extends AbstractHelper
         
         $requestObject = new \SimpleXMLElement("<GenerateRequest></GenerateRequest>");
         $requestObject->addChild("PxPayUserId", $userId);
-        $requestObject->addChild("PxPayKey", $pxPayKey);
+        $requestObject->addChild("PxPayKey", $partPayKey);
         $requestObject->addChild("TxnType", $requestData->getTransactionType());
         $requestObject->addChild("MerchantReference", $requestData->getOrderIncrementId()); // order incrementId
         $requestObject->addChild("TxnId", $requestData->getTxnId());
@@ -144,8 +144,8 @@ class Communication extends AbstractHelper
     {
         $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} token:{$token}");
         $pxPayKey = "";
-        if ($userId == $this->_configuration->getPxPayUserId()) {
-            $pxPayKey = $this->_configuration->getPxPayKey();
+        if ($userId == $this->_configuration->getPartPayUserId()) {
+            $pxPayKey = $this->_configuration->getPartPayKey();
         }
         
         $requestObject = new \SimpleXMLElement("<ProcessResponse></ProcessResponse>");

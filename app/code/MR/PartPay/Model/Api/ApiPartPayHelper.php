@@ -17,7 +17,7 @@ class ApiPartPayHelper
      *
      * @var \MR\PartPay\Helper\PartPay\UrlCreator
      */
-    private $_pxpayUrlCreator;
+    private $_partpayUrlCreator;
     /**
      *
      * @var \MR\PartPay\Logger\PartPayLogger
@@ -27,7 +27,7 @@ class ApiPartPayHelper
     public function __construct()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->_pxpayUrlCreator = $objectManager->get("\MR\PartPay\Helper\PxPay\UrlCreator");
+        $this->_partpayUrlCreator = $objectManager->get("\MR\PartPay\Helper\PartPay\UrlCreator");
         $this->_apiCommonHelper = $objectManager->get("\MR\PartPay\Model\Api\ApiCommonHelper");
         
         $this->_logger = $objectManager->get("\MR\PartPay\Logger\PartPayLogger");
@@ -58,7 +58,7 @@ class ApiPartPayHelper
     private function _createUrl(\Magento\Quote\Model\Quote $quote)
     {
         // Create pxpay redirect url.
-        $url = $this->_pxpayUrlCreator->CreateUrl($quote);
+        $url = $this->_partpayUrlCreator->CreateUrl($quote);
         if (!isset($url) || empty($url)){
             $quoteId = $quote->getId();
             $this->_logger->critical(__METHOD__ . " Failed to create transaction quoteId:{$quoteId}");

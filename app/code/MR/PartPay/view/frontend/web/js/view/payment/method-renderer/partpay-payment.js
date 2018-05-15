@@ -52,7 +52,7 @@ define(
                                         }
                                     }).form();
                     if (isValid && additionalValidators.validate()) {
-                        setPaymentMethodAction(this.messageContainer, "pxpay2", this.getPaymentData(), this.redirectToPartPay, {});
+                        setPaymentMethodAction(this.messageContainer, "partpay", this.getPaymentData(), this.redirectToPartPay, {});
                     }
                 },
             }

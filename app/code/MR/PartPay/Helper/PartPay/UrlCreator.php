@@ -46,16 +46,13 @@ class UrlCreator
     public function CreateUrl(\Magento\Quote\Model\Quote $quote)
     {
         $this->_logger->info(__METHOD__);
+        $requestData = $this->_buildPartPayRequestData($quote);
         
-        $transactionType = $this->_configuration->getPaymentType($quote->getStoreId());
-        $forceA2A = $this->_configuration->getForceA2A($quote->getStoreId());
-        $requestData = $this->_buildPxPayRequestData($quote, $transactionType, $forceA2A);
-        
-        $responseXml = $this->_communication->getPxPay2Page($requestData);
+        $responseXml = $this->_communication->getPartPayPage($requestData);
         
         $responseXmlElement = simplexml_load_string($responseXml);
         if (!$responseXmlElement) {
-            $error = "Invalid response from PaymentExpress: " . $responseXml;
+            $error = "Invalid response from PartPay: " . $responseXml;
             $this->_logger->critical(__METHOD__ . " " . $error);
             return "";
         }
@@ -78,11 +75,11 @@ class UrlCreator
         return (string)$responseXmlElement->URI;
     }
 
-    private function _buildPxPayRequestData(\Magento\Quote\Model\Quote $quote, $transactionType, $forceA2A)
+    private function _buildPartPayRequestData(\Magento\Quote\Model\Quote $quote)
     {
         $orderIncrementId = $quote->getReservedOrderId();
         $this->_logger->info(
-            __METHOD__ . " orderIncrementId:{$orderIncrementId} transactionType:{$transactionType} forceA2A:{$forceA2A}");
+            __METHOD__ . " orderIncrementId:{$orderIncrementId}");
         
         $currency = $quote->getBaseCurrencyCode();
         $amount = $quote->getBaseGrandTotal();
@@ -94,10 +91,6 @@ class UrlCreator
         
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $dataBag = $objectManager->create("\Magento\Framework\DataObject");
-        $dataBag->setForceA2A(false);
-        if ($transactionType == "Purchase" && $forceA2A) {
-            $dataBag->setForceA2A(true);
-        }
         
         $txnId = substr(uniqid(rand()), 0, 16);
         $dataBag->setTxnId($txnId); // quote cannot be used as txnId. As quote may pay failed.

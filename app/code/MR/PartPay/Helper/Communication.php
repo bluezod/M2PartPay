@@ -38,7 +38,7 @@ class Communication extends AbstractHelper
     {
         $this->_logger->info(__METHOD__);
         $requestXml = $this->_buildPartPayRequest($requestData);
-        $url = $this->_configuration->getPartPayUrl($storeId);
+        $url = $this->_configuration->getPartPayApiEndpoint($storeId);
         return $this->_sendRequest($requestXml, $url);
     }
 
@@ -47,7 +47,7 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} storeId:{$storeId}");
         $requestXml = $this->_buildProcessResponseRequest($userId, $token);
         
-        $pxPayUrl = $this->_configuration->getPartPayUrl($storeId);
+        $pxPayUrl = $this->_configuration->getPartPayApiEndpoint($storeId);
         $responseXml = $this->_sendRequest($requestXml, $pxPayUrl);
         
         $this->_logger->info(__METHOD__ . " responseXml:" . $responseXml);
@@ -76,8 +76,8 @@ class Communication extends AbstractHelper
     private function _buildPartPayRequest($requestData, $storeId = null)
     {
         $this->_logger->info(__METHOD__);
-        $userId = $this->_configuration->getPartPayUserId($storeId);
-        $partPayKey = $this->_configuration->getPartPayKey($storeId);
+        $userId = $this->_configuration->getPartPayClientId($storeId);
+        $partPayKey = $this->_configuration->getPartPayClientSecret($storeId);
         
         $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
         $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
@@ -144,8 +144,8 @@ class Communication extends AbstractHelper
     {
         $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} token:{$token}");
         $pxPayKey = "";
-        if ($userId == $this->_configuration->getPartPayUserId()) {
-            $pxPayKey = $this->_configuration->getPartPayKey();
+        if ($userId == $this->_configuration->getPartPayClientId()) {
+            $pxPayKey = $this->_configuration->getPartPayClientSecret();
         }
         
         $requestObject = new \SimpleXMLElement("<ProcessResponse></ProcessResponse>");

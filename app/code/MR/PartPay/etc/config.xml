@@ -5,9 +5,18 @@
 			<mr_partpay>
 				<model>MR\PartPay\Model\Payment</model>
 				<active>1</active>
+				<payment_action>order</payment_action>
+				<order_status>pending_partpay</order_status>
 				<title>PartPay</title>
 				<allowspecific>0</allowspecific>
-				<sort_order>20</sort_order>
+				<!--<api_endpoint>https://api.partpay.co.nz/</api_endpoint>-->
+				<api_endpoint>http://api.ci.partpay.net/</api_endpoint>
+				<auth_token_endpoint>https://partpay-dev.au.auth0.com/oauth/token</auth_token_endpoint>
+				<api_audience>https://auth-dev.partpay.co.nz</api_audience>
+				<min>10</min>
+				<max>1000</max>
+				<debug_flag>1</debug_flag>
+				<sort_order>200</sort_order>
 			</mr_partpay>
 		</payment>
 	</default>

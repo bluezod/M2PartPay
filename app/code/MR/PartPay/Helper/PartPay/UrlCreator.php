@@ -43,32 +43,20 @@ class UrlCreator
     {
         $this->_logger->info(__METHOD__);
         $requestData = $this->_buildPartPayRequestData($quote);
-        
-        $responseXml = $this->_communication->getPartPayPage($requestData);
-        
-        $responseXmlElement = simplexml_load_string($responseXml);
-        if (!$responseXmlElement) {
-            $error = "Invalid response from PartPay: " . $responseXml;
-            $this->_logger->critical(__METHOD__ . " " . $error);
-            return "";
-        }
-        
-        if ($responseXmlElement['valid'] != "1" || !$responseXmlElement->URI) {
-            $error = "Failed to get the Payment Url";
-            // <Request valid="1"><Reco>W2</Reco><ResponseText>No Account2Account Account Setup For Payment Currency</ResponseText></Request>
-            if (isset($responseXmlElement->Reco) || isset($responseXmlElement->ResponseText)) {
-                $error = "Error from PaymentExpress: ReCo: " . $responseXmlElement->Reco . " ResponseText:" .
-                     $responseXmlElement->ResponseText;
-            } elseif (isset($responseXmlElement->URI)) {
-                $error = "Error from PaymentExpress: " . $responseXmlElement->URI;
-            }
 
-            $this->_logger->critical(__METHOD__ . " " . $error);
-            
-            return "";
+        try {
+            $response = $this->_communication->getPartPayPage($requestData);
+        }catch (\Exception $ex) {
+            $this->_logger->error($ex->getMessage());
+            return false;
         }
 
-        return (string)$responseXmlElement->URI;
+        if (!$response || empty($response['redirectUrl'])) {
+            $error = "Invalid response from PartPay: " . $response;
+            $this->_logger->critical(__METHOD__ . " " . $error);
+            return false;
+        }
+        return (string)$response['redirectUrl'];
     }
 
     private function _buildPartPayRequestData(\Magento\Quote\Model\Quote $quote)
@@ -118,11 +106,6 @@ class UrlCreator
                 'price' => $item->getBaseRowTotalInclTax(),
             );
         }
-
-        $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
-        $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
-        $param['merchant']['redirectConfirmUrl'] = Mage::getUrl('partpay/order/success', array('_nosid' => true, 'order_id' => $orderIncrementId));
-        $param['merchant']['redirectCancelUrl'] = Mage::getUrl('partpay/order/fail', array('_nosid' => true, 'order_id' => $orderIncrementId));
 
         $param['merchantReference'] = $orderIncrementId;
         $param['taxAmount'] = $quote->getTaxAmount();

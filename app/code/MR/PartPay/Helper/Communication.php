@@ -41,9 +41,16 @@ class Communication extends AbstractHelper
     public function getPartPayPage($requestData, $storeId = null)
     {
         $this->_logger->info(__METHOD__);
-        $requestXml = $this->_buildPartPayRequest($requestData);
+
+        $orderIncrementId = $requestData['merchantReference'];
+        $requestData['merchant']['redirectConfirmUrl'] = $this->_getUrl('partpay/order/success', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
+        $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
+
+        $this->_logger->info(__METHOD__ . " request: {$requestData}");
         $url = $this->_configuration->getPartPayApiEndpoint($storeId);
-        return $this->_sendRequest($requestXml, $url);
+        $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
+        $response = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, $requestData);
+        return $this->_parseResult($response);
     }
 
     public function getTransactionStatus($userId, $token, $storeId = null)
@@ -74,74 +81,6 @@ class Communication extends AbstractHelper
         $url = $this->_configuration->getPxPostUrl($storeId);
 
         return $this->_sendRequest($requestXml, $url);
-    }
-
-    // Private function below
-    private function _buildPartPayRequest($requestData, $storeId = null)
-    {
-        $this->_logger->info(__METHOD__);
-        $userId = $this->_configuration->getPartPayClientId($storeId);
-        $partPayKey = $this->_configuration->getPartPayClientSecret($storeId);
-
-        $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
-        $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
-
-        $amount = $requestData->getAmount();
-        $currency = $requestData->getCurrency();
-        $formattedAmount = $this->_paymentUtil->formatCurrency($amount, $currency);
-
-        $requestObject = new \SimpleXMLElement("<GenerateRequest></GenerateRequest>");
-        $requestObject->addChild("PxPayUserId", $userId);
-        $requestObject->addChild("PxPayKey", $partPayKey);
-        $requestObject->addChild("TxnType", $requestData->getTransactionType());
-        $requestObject->addChild("MerchantReference", $requestData->getOrderIncrementId()); // order incrementId
-        $requestObject->addChild("TxnId", $requestData->getTxnId());
-        $requestObject->addChild("AmountInput", $formattedAmount);
-        $requestObject->addChild("CurrencyInput", $currency);
-        $requestObject->addChild("UrlFail", $urlFail);
-        $requestObject->addChild("UrlSuccess", $urlSuccess);
-        $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
-
-        if ($requestData->getForceA2A()) {
-            $requestObject->addChild("ForcePaymentMethod", "Account2Account");
-        }
-
-        // field max length: https://www.paymentexpress.com/Technical_Resources/Ecommerce_Hosted/PxPay_2_0
-        $addNonEmptyValue = function ($name, $value, $maxLength) use (&$requestObject) {
-            if (isset($value) && $value) {
-                $requestObject->addChild($name, substr($value, 0, $maxLength));
-            }
-        };
-
-        // customer information:
-
-        // <TxnData1>John Doe</TxnData1>
-        // <TxnData2>0211111111</TxnData2>
-        // <TxnData3>98 Anzac Ave, Auckland 1010</TxnData3>
-
-        // This always if possible (consumer email)
-        // <EmailAddress>samplepxpayuser@paymentexpress.com</EmailAddress>
-
-        // This is for look up (should be order id )
-        // <TxnId>ABC123</TxnId>
-
-        // For risk management (consumer information):
-        // PhoneNumber -- if possible.
-        // AccountInfo -- should be like the specific user.
-
-        $customerInfo = $requestData->getCustomerInfo();
-        $addNonEmptyValue("TxnData1", $customerInfo->getName(), 255);
-        $addNonEmptyValue("TxnData2", $customerInfo->getPhoneNumber(), 255);
-        $addNonEmptyValue("TxnData3", $customerInfo->getAddress(), 255);
-
-        $addNonEmptyValue("EmailAddress", $customerInfo->getEmail(), 255);
-        $addNonEmptyValue("PhoneNumber", $customerInfo->getPhoneNumber(), 10);
-        $addNonEmptyValue("AccountInfo", $customerInfo->getId(), 128);
-
-        $requestXml = $requestObject->asXML();
-
-        $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
-        return $requestXml;
     }
 
     private function _buildProcessResponseRequest($userId, $token)

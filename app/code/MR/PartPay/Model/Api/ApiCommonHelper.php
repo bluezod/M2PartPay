@@ -82,7 +82,7 @@ class ApiCommonHelper
         $info = $payment->getAdditionalInformation();
         if ($info["cartId"] != $cartId) {
             // Maybe merchant do not use the default implementation of PaymentInterface, leads the $method->getData() not return the data from js?
-            $this->_logger->info(__METHOD__ . " Unexpect behavior! cartId set incorrectly. PaymentInterface.class:" . get_class($method) ." payment.info:" . var_export($info, true));
+            $this->_logger->info(__METHOD__ . " Unexpected behavior! cartId set incorrectly. PaymentInterface.class:" . get_class($method) ." payment.info:" . var_export($info, true));
             $info["cartId"] = $cartId;
             $info["guestEmail"] = $email;
             

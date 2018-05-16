@@ -44,7 +44,7 @@
 
                 <field id="merchant_name" translate="label" type="text"
                        sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Client ID</label>
+                    <label>Merchant Name</label>
                 </field>
             </group>
 

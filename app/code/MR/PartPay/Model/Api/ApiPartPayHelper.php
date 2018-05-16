@@ -57,7 +57,7 @@ class ApiPartPayHelper
     
     private function _createUrl(\Magento\Quote\Model\Quote $quote)
     {
-        // Create pxpay redirect url.
+        // Create partpay redirect url.
         $url = $this->_partpayUrlCreator->CreateUrl($quote);
         if (!isset($url) || empty($url)){
             $quoteId = $quote->getId();

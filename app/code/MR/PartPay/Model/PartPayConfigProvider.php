@@ -40,19 +40,13 @@ class PartPayConfigProvider implements ConfigProviderInterface
         $quote = $session->getQuote();
         $quoteId = $quote->getId();
         
-        $customerSession = $this->_objectManager->get("\Magento\Customer\Model\Session");
-        $isRebillEnabled = ($customerSession->isLoggedIn() && $this->_configuration->getAllowRebill());
-        $showCardOptions = $isRebillEnabled && !$this->_configuration->getForceA2A(); // not show card configuration when rebill is false or A2A is disabled.
-        
-        $paymentUtil = $this->_objectManager->get("\MR\PartPay\Helper\PaymentUtil");
+        $customerSession = $this->_objectManager->get("\Magento\Customer\Model\Session"); $paymentUtil = $this->_objectManager->get("\MR\PartPay\Helper\PaymentUtil");
 
         
         return [
             'payment' => [
                 'paymentexpress' => [
                     'redirectUrl' => $paymentUtil->buildRedirectUrl($quoteId),
-                    'isRebillEnabled' => $isRebillEnabled,
-                    'showCardOptions' => $showCardOptions,
                     'method' => \MR\PartPay\Model\Payment::MR_PARTPAY_CODE
                 ]
             ]

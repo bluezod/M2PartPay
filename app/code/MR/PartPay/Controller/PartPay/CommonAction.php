@@ -294,9 +294,6 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         
         // TODO: Save currency because I do not know how to get currency in payment::capture. Remove it when found a better way
         $info["Currency"] = (string)$paymentResponseXmlElement->CurrencyInput;
-        if ($this->_configuration->getAllowRebill()) {
-            $info["DpsBillingId"] = (string)$paymentResponseXmlElement->DpsBillingId;
-        }
         
         $payment->unsAdditionalInformation(); // ensure DpsBillingId is not saved to database.
         $payment->setAdditionalInformation($info);

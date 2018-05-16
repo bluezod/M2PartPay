@@ -1,10 +1,6 @@
 <?php
 namespace MR\PartPay\Helper\PartPay;
 
-use \Magento\Framework\App\Helper\AbstractHelper;
-use \Magento\Framework\App\Helper\Context;
-use \Magento\Payment\Gateway\Http\Client\Soap;
-
 class UrlCreator
 {
 
@@ -78,38 +74,62 @@ class UrlCreator
     private function _buildPartPayRequestData(\Magento\Quote\Model\Quote $quote)
     {
         $orderIncrementId = $quote->getReservedOrderId();
-        $this->_logger->info(
-            __METHOD__ . " orderIncrementId:{$orderIncrementId}");
-        
-        $currency = $quote->getBaseCurrencyCode();
-        $amount = $quote->getBaseGrandTotal();
-        
-        $additionalInfo = [];
-        
-        $payment = $quote->getPayment();
-        $additionalInfo = $payment->getAdditionalInformation();
-        
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $dataBag = $objectManager->create("\Magento\Framework\DataObject");
-        
-        $txnId = substr(uniqid(rand()), 0, 16);
-        $dataBag->setTxnId($txnId); // quote cannot be used as txnId. As quote may pay failed.
-        
-        // <TxnId>ABC123</TxnId>
-        // <TxnData1>John Doe</TxnData1>
-        // <TxnData2>0211111111</TxnData2>
-        // <TxnData3>98 Anzac Ave, Auckland 1010</TxnData3>
-        
-        $dataBag->setAmount($amount);
-        $dataBag->setCurrency($currency);
-        $dataBag->setTransactionType($transactionType);
-        $dataBag->setOrderIncrementId($orderIncrementId);
-        $dataBag->setQuoteId($quote->getId());
-        
+        $this->_logger->info(__METHOD__ . " orderIncrementId:{$orderIncrementId}");
+
         $customerInfo = $this->_loadCustomerInfo($quote);
-        $dataBag->setCustomerInfo($customerInfo);
-        $this->_logger->info(__METHOD__ . " dataBag:" . var_export($dataBag, true));
-        return $dataBag;
+        //format order
+        $param = array();
+        $param['amount'] = $quote->getBaseGrandTotal();
+
+        $param['consumer']['phoneNumber'] = $customerInfo->getPhoneNumber();
+        $param['consumer']['surname'] = $customerInfo->getSurname();
+        $param['consumer']['email'] = $quote->getCustomerEmail();
+
+        $param['billing']['addressLine1'] = $customerInfo->getBillingStreet1();
+        $param['billing']['addressLine2'] = $customerInfo->getBillingStreet2();
+        $param['billing']['suburb'] = '';
+        $param['billing']['city'] = $quote->getBillingAddress()->getCity();
+        $param['billing']['postcode'] = $quote->getBillingAddress()->getPostcode();
+        $param['billing']['state'] = $quote->getBillingAddress()->getRegion() ? $quote->getBillingAddress()->getRegion() : '';
+        $param['billing']['country'] = $quote->getBillingAddress()->getCountry();
+
+        $param['shipping']['addressLine1'] = $customerInfo->getShippingStreet1();
+        $param['shipping']['addressLine2'] = $customerInfo->getShippingStreet2();
+        $param['shipping']['suburb'] = '';
+        $param['shipping']['city'] = $quote->getShippingAddress()->getCity();
+        $param['shipping']['postcode'] = $quote->getShippingAddress()->getPostcode();
+        $param['shipping']['state'] = $quote->getShippingAddress()->getRegion();
+        $param['shipping']['country'] = $quote->getShippingAddress()->getCountry();
+
+        $param['description'] = '';
+
+        $productManager = $this->_objectManager->create("\Magento\Catalog\Model\Product");
+        //format all items in cart
+        foreach ( $quote->getAllVisibleItems() as $item){
+            /**
+             * @var \Magento\Catalog\Model\Product $product
+             */
+            $product = $productManager->load($item->getProductId());
+            $param['items'][] = array(
+                'description' => $product->getDescription(),
+                'name' => $item->getName(),
+                'sku' => $item->getSku(),
+                'quantity' => $item->getQtyOrdered(),
+                'price' => $item->getBaseRowTotalInclTax(),
+            );
+        }
+
+        $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
+        $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
+        $param['merchant']['redirectConfirmUrl'] = Mage::getUrl('partpay/order/success', array('_nosid' => true, 'order_id' => $orderIncrementId));
+        $param['merchant']['redirectCancelUrl'] = Mage::getUrl('partpay/order/fail', array('_nosid' => true, 'order_id' => $orderIncrementId));
+
+        $param['merchantReference'] = $orderIncrementId;
+        $param['taxAmount'] = $quote->getTaxAmount();
+        $param['shippingAmount'] = $quote->getShippingAmount();
+
+        $this->_logger->info(__METHOD__ . " param:" . var_export($param, true));
+        return $param;
     }
 
     private function _loadCustomerInfo(\Magento\Quote\Model\Quote $quote)
@@ -117,26 +137,41 @@ class UrlCreator
         $customerId = $quote->getCustomerId();
         $this->_logger->info(__METHOD__ . " customerId:{$customerId}");
         $customerInfo = $this->_objectManager->create("\Magento\Framework\DataObject");
-        
+
         $customerInfo->setId($customerId);
-        
-        $customerInfo->setName($this->_getCustomerName($quote));
+
+        $customerInfo->setSurname($this->_getCustomerSurname($quote));
         $customerInfo->setEmail($quote->getCustomerEmail());
-        
+
         try {
-            $address = $quote->getBillingAddress();
-            if ($address) {
-                $customerInfo->setPhoneNumber($address->getTelephone());
-                
-                $streetFull = implode(" ", $address->getStreet()) . " " . $address->getCity() . ", " .
-                     $address->getRegion() . " " . $address->getPostcode() . " " . $address->getCountryId();
-                
-                $customerInfo->setAddress($streetFull);
+            $billingAddress = $quote->getBillingAddress();
+            if ($billingAddress) {
+                $customerInfo->setPhoneNumber($billingAddress->getTelephone());
+
+                $billingStreetData = $billingAddress->getStreet();
+                $streetFull = implode(" ", $billingStreetData) . " " . $billingAddress->getCity() . ", " .
+                    $billingAddress->getRegion() . " " . $billingAddress->getPostcode() . " " . $billingAddress->getCountryId();
+                if (isset($billingStreetData[0])) {
+                    $customerInfo->setBillingStreet1($billingStreetData[0]);
+                }
+                if (isset($billingStreetData[1])) {
+                    $customerInfo->setBillingStreet2($billingStreetData[1]);
+                }
+                $customerInfo->setFullAddress($streetFull);
+            }
+            if ($shippingAddress = $quote->getShippingAddress()) {
+                $shippingStreetData = $shippingAddress->getStreet();
+                if (isset($shippingStreetData[0])) {
+                    $customerInfo->setShippingStreet1($shippingStreetData[0]);
+                }
+                if (isset($shippingStreetData[1])) {
+                    $customerInfo->setShippingStreet2($shippingStreetData[1]);
+                }
             }
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $this->_logger->critical($e->_toString());
         }
-        
+
         return $customerInfo;
     }
 
@@ -145,15 +180,15 @@ class UrlCreator
      *
      * @return string
      */
-    private function _getCustomerName(\Magento\Quote\Model\Quote $quote)
+    private function _getCustomerSurname(\Magento\Quote\Model\Quote $quote)
     {
-        if ($quote->getCustomerFirstname()) {
-            $customerName = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
+        if ($quote->getCustomerLastname()) {
+            $customerName = $quote->getCustomerLastname();
         } else {
-            $customerName = (string)__('Guest');
+            $customerName = $quote->getBillingAddress()->getLastname();
         }
         
-        $this->_logger->info(__METHOD__ . " customerName:{$customerName}");
+        $this->_logger->info(__METHOD__ . " customerSurname:{$customerName}");
         return $customerName;
     }
 }

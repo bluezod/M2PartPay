@@ -1,8 +1,9 @@
 <?php
+
 namespace MR\PartPay\Helper;
 
-use \Magento\Framework\App\Helper\AbstractHelper;
-use \Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 
 class Communication extends AbstractHelper
 {
@@ -18,6 +19,8 @@ class Communication extends AbstractHelper
      */
     private $_paymentUtil;
 
+    private $_accessToken;
+
     /**
      *
      * @var \MR\PartPay\Helper\Configuration
@@ -32,6 +35,7 @@ class Communication extends AbstractHelper
         $this->_configuration = $objectManager->get("\MR\PartPay\Helper\Configuration");
         $this->_paymentUtil = $objectManager->get("\MR\PartPay\Helper\PaymentUtil");
         $this->_logger->info(__METHOD__);
+        $this->_accessToken = null;
     }
 
     public function getPartPayPage($requestData, $storeId = null)
@@ -46,10 +50,10 @@ class Communication extends AbstractHelper
     {
         $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} storeId:{$storeId}");
         $requestXml = $this->_buildProcessResponseRequest($userId, $token);
-        
+
         $pxPayUrl = $this->_configuration->getPartPayApiEndpoint($storeId);
         $responseXml = $this->_sendRequest($requestXml, $pxPayUrl);
-        
+
         $this->_logger->info(__METHOD__ . " responseXml:" . $responseXml);
         return $responseXml;
     }
@@ -59,7 +63,7 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " amount:{$amount} currency:{$currency} dpsTxnRef:{$dpsTxnRef} storeId:{$storeId}");
         $requestXml = $this->_buildRefundRequestXml($amount, $currency, $dpsTxnRef, $storeId);
         $url = $this->_configuration->getPxPostUrl($storeId);
-        
+
         return $this->_sendRequest($requestXml, $url);
     }
 
@@ -68,24 +72,24 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " amount:{$amount} currency:{$currency} dpsTxnRef:{$dpsTxnRef} storeId:{$storeId}");
         $requestXml = $this->_buildCompleteRequestXml($amount, $currency, $dpsTxnRef, $storeId);
         $url = $this->_configuration->getPxPostUrl($storeId);
-        
+
         return $this->_sendRequest($requestXml, $url);
     }
-    
+
     // Private function below
     private function _buildPartPayRequest($requestData, $storeId = null)
     {
         $this->_logger->info(__METHOD__);
         $userId = $this->_configuration->getPartPayClientId($storeId);
         $partPayKey = $this->_configuration->getPartPayClientSecret($storeId);
-        
+
         $urlFail = $this->_getUrl('pxpay2/pxpay2/fail', ['_secure' => true]);
         $urlSuccess = $this->_getUrl('pxpay2/pxpay2/success', ['_secure' => true]);
-        
+
         $amount = $requestData->getAmount();
         $currency = $requestData->getCurrency();
         $formattedAmount = $this->_paymentUtil->formatCurrency($amount, $currency);
-        
+
         $requestObject = new \SimpleXMLElement("<GenerateRequest></GenerateRequest>");
         $requestObject->addChild("PxPayUserId", $userId);
         $requestObject->addChild("PxPayKey", $partPayKey);
@@ -97,7 +101,7 @@ class Communication extends AbstractHelper
         $requestObject->addChild("UrlFail", $urlFail);
         $requestObject->addChild("UrlSuccess", $urlSuccess);
         $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
-        
+
         if ($requestData->getForceA2A()) {
             $requestObject->addChild("ForcePaymentMethod", "Account2Account");
         }
@@ -108,34 +112,34 @@ class Communication extends AbstractHelper
                 $requestObject->addChild($name, substr($value, 0, $maxLength));
             }
         };
-        
+
         // customer information:
-        
+
         // <TxnData1>John Doe</TxnData1>
         // <TxnData2>0211111111</TxnData2>
         // <TxnData3>98 Anzac Ave, Auckland 1010</TxnData3>
-        
+
         // This always if possible (consumer email)
         // <EmailAddress>samplepxpayuser@paymentexpress.com</EmailAddress>
-        
+
         // This is for look up (should be order id )
         // <TxnId>ABC123</TxnId>
-        
+
         // For risk management (consumer information):
         // PhoneNumber -- if possible.
         // AccountInfo -- should be like the specific user.
-        
+
         $customerInfo = $requestData->getCustomerInfo();
         $addNonEmptyValue("TxnData1", $customerInfo->getName(), 255);
         $addNonEmptyValue("TxnData2", $customerInfo->getPhoneNumber(), 255);
         $addNonEmptyValue("TxnData3", $customerInfo->getAddress(), 255);
-        
+
         $addNonEmptyValue("EmailAddress", $customerInfo->getEmail(), 255);
         $addNonEmptyValue("PhoneNumber", $customerInfo->getPhoneNumber(), 10);
         $addNonEmptyValue("AccountInfo", $customerInfo->getId(), 128);
-        
+
         $requestXml = $requestObject->asXML();
-        
+
         $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
         return $requestXml;
     }
@@ -147,33 +151,84 @@ class Communication extends AbstractHelper
         if ($userId == $this->_configuration->getPartPayClientId()) {
             $pxPayKey = $this->_configuration->getPartPayClientSecret();
         }
-        
+
         $requestObject = new \SimpleXMLElement("<ProcessResponse></ProcessResponse>");
         $requestObject->addChild("PxPayUserId", $userId);
         $requestObject->addChild("PxPayKey", $pxPayKey);
         $requestObject->addChild("Response", $token);
         $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
-        
+
         $requestXml = $requestObject->asXML();
-        
+
         $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
-        
+
         return $requestXml;
     }
 
-    private function _sendRequest($requestXml, $postUrl)
+    protected function _getAccessToken($storeId = null)
     {
-        $this->_logger->info(__METHOD__ . " postUrl: {$postUrl}");
+        if (!$this->_accessToken) {
+            $accessTokenParam = [
+                'grant_type' => 'client_credentials',
+                'client_id' => $this->_configuration->getPartPayClientId($storeId),
+                'client_secret' => $this->_configuration->getPartPayClientSecret($storeId),
+                'audience' => $this->_configuration->getPartPayApiAudience($storeId),
+            ];
+
+            $headers = [
+                'Content-Type' => 'application/json'
+            ];
+            $url = $this->_configuration->getPartPayAuthTokenEndpoint($storeId);
+
+            $accessTokenResult = $this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam));
+            $this->_accessToken = $this->_parseResult($accessTokenResult)['access_token'];
+        }
+        return $this->_accessToken;
+    }
+
+    protected function _getApiUrl($path, $storeId = null)
+    {
+        $baseUrl = $this->_configuration->getPartPayApiEndpoint($storeId);
+        $apiUrl = rtrim($baseUrl, '/') . '/' . trim($path, '/');
+        return $apiUrl;
+    }
+
+    protected function _parseResult($response)
+    {
+        return json_decode($response->getBody());
+    }
+
+    private function _sendRequest($url, $header = [], $params = [], $method = \Magento\Framework\HTTP\ZendClient::GET, $postBody = null)
+    {
+        $this->_logger->info(__METHOD__ . " postUrl: {$url}");
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $postUrl);
+        switch ($method) {
+            case "POST":
+                curl_setopt($ch, CURLOPT_POST, 1);
+
+                if ($postBody)
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $postBody);
+                break;
+            case "PUT":
+                curl_setopt($ch, CURLOPT_PUT, 1);
+                break;
+            default:
+                if (!empty($params))
+                    $url = sprintf("%s?%s", $url, http_build_query($params));
+        }
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        if (!empty($header)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }
+
         curl_setopt($ch, CURLOPT_TIMEOUT, 180);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $requestXml);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        
+
         $response = curl_exec($ch);
         if (!$response) {
             $errorMessage = " Error:" . curl_error($ch) . " Error Code:" . curl_errno($ch);
@@ -181,14 +236,14 @@ class Communication extends AbstractHelper
         } else {
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             if ($httpcode && substr($httpcode, 0, 2) != "20") {
-                $errorMessage = " HTTP CODE: {$httpcode} for URL: {$postUrl}";
+                $errorMessage = " HTTP CODE: {$httpcode} for URL: {$url}";
                 $this->_logger->critical(__METHOD__ . $errorMessage);
             }
         }
         curl_close($ch);
-        
-        $this->_logger->info(__METHOD__ . " response from PxPay2:" . $response);
-        
+
+        $this->_logger->info(__METHOD__ . " response from PartPay:" . $response);
+
         return $response;
     }
 
@@ -217,7 +272,7 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__);
         $username = $this->_configuration->getPxPostUsername($storeId);
         $password = $this->_configuration->getPxPassword($storeId);
-        
+
         $formattedAmount = $this->_paymentUtil->formatCurrency($amount, $currency);
         $requestObject = new \SimpleXMLElement("<Txn></Txn>");
         $requestObject->addChild("PostUsername", $username);
@@ -229,9 +284,9 @@ class Communication extends AbstractHelper
         $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
 
         $requestXml = $requestObject->asXML();
-        
+
         $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
-        
+
         return $requestXml;
     }
 

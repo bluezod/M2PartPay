@@ -54,7 +54,6 @@ return [
     'Magento_Deploy' => 1,
     'Magento_Developer' => 1,
     'Magento_Dhl' => 1,
-    'Algolia_AlgoliaSearch' => 1,
     'Magento_CatalogRule' => 1,
     'Magento_ImportExport' => 1,
     'Magento_Weee' => 1,

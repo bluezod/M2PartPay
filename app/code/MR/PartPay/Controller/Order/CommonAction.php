@@ -148,7 +148,7 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
             return;
         }
 
-        $response = $this->_getTransactionStatus($orderIncrementId, $partpayId);
+        $response = $this->_getTransactionStatus($partpayId);
         if (!$response) {
             return;
         }
@@ -204,6 +204,9 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         
         $quoteId = $quote->getId();
         $payment = $quote->getPayment();
+        if (!isset($response['orderStatus']) || $response['orderStatus'] != 'Approved') {
+            throw new \Magento\Framework\Exception\PaymentException(__('Payment failed. Order was not placed.'));
+        }
         
         $info = $payment->getAdditionalInformation();
         $this->_logger->info(__METHOD__ . " info:" . var_export($info, true));
@@ -303,18 +306,18 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         $this->_logger->info(__METHOD__ . " done");
     }
 
-    private function _getTransactionStatus($orderIncrementId, $partpayId)
+    private function _getTransactionStatus($partpayId)
     {
         try{
             if(!$partpayId){
                 throw new \Magento\Framework\Exception\NotFoundException(__('Can\'t find the initial PartPay request ID.'));
             }
-            $response = $this->_communication->getTransactionStatus($orderIncrementId);
+            $response = $this->_communication->getTransactionStatus($partpayId);
             if (!$response) { // defensive code. should never happen
                 throw new \Magento\Framework\Exception\NotFoundException(__('Transaction status checking response format is incorrect.'));
             }
         } catch (\Exception $ex) {
-            $this->_logger->critical(__METHOD__ . " order:{$orderIncrementId} partpayId:{$partpayId} response format is incorrect");
+            $this->_logger->critical(__METHOD__ . " partpayId:{$partpayId} response format is incorrect");
             $this->_redirectToCartPageWithError("Failed to connect to PartPay checking transaction status. Please try again later.");
             return false;
         }

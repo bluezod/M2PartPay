@@ -61,32 +61,14 @@ class PaymentHelper
     {
         // invoked by Magento\Sales\Model\Order\Payment::place
         $this->_logger->info(__METHOD__);
-        $paymentType = $this->_configuration->getPaymentType($storeId);
-        $paymentAction = "";
-    
-        if ($paymentType == \PaymentExpress\PxPay2\Model\Config\Source\PaymentOptions::PURCHASE) {
-            $paymentAction = \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE_CAPTURE;
-        }
-        if ($paymentType == \PaymentExpress\PxPay2\Model\Config\Source\PaymentOptions::AUTH) {
-            $paymentAction = \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE;
-        }
+        $paymentAction = \Magento\Payment\Model\Method\AbstractMethod::ACTION_AUTHORIZE_CAPTURE;
         $this->_logger->info(__METHOD__ . " paymentAction: {$paymentAction}");
         return $paymentAction;
     }
 	
 	public function canCapture($storeId, $info)
 	{
-		$this->_logger->info(__METHOD__);
-
-		$paymentType = $this->_configuration->getPaymentType($storeId);
-		$canCapture = true;
-		if ($paymentType == \PaymentExpress\PxPay2\Model\Config\Source\PaymentOptions::PURCHASE) {
-			$canCapture = true;
-		} else {
-			$canCapture = !($this->canRefund($info)); // Complete transaction is processed.
-		}
-		$this->_logger->info(__METHOD__ . " canCapture:{$canCapture}");
-		return $canCapture;
+		return true;
 	}
 	
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $storeId)
@@ -100,38 +82,12 @@ class PaymentHelper
             $orderId = $order->getIncrementId();
         }
         
-        if (!$payment->hasAdditionalInformation())
-        	$this->_logger->info(__METHOD__ . " orderId:{$orderId} additional_information is empty");
-        
-        $isPurchase = ($payment->getAdditionalInformation("DpsTransactionType") == "Purchase");
-        $info = $payment->getAdditionalInformation();
-        
-        $transactionId = $info["DpsTxnRef"]; // ensure it is unique
-        
-        if (!$isPurchase) {
-            $currency = $info["Currency"];
-            $dpsTxnRef = $info["DpsTxnRef"];
-            $responseXml = $this->_communication->complete($amount, $currency, $dpsTxnRef, $storeId);
-            $responseXmlElement = simplexml_load_string($responseXml);
-            $this->_logger->info(__METHOD__ . "  responseXml:" . $responseXml);
-            if (!$responseXmlElement) {
-                $this->_paymentUtil->saveInvalidResponse($payment, $responseXml);
-                $errorMessage = "Failed to capture order:{$orderId}, response from paymentexpress: {$responseXml}";
-                $this->_logger->critical(__METHOD__ . $errorMessage);
-                throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
-            }
-            if (!$responseXmlElement->Transaction || $responseXmlElement->Transaction["success"] != "1") {
-                $this->_paymentUtil->savePxPostResponse($payment, $responseXmlElement);
-                $errorMessage = "Failed to capture order:{$orderId}, response from paymentexpress: {$responseXml}";
-                $this->_logger->critical(__METHOD__ . $errorMessage);
-                throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
-            }
-            
-            $this->_paymentUtil->savePxPostResponse($payment, $responseXmlElement);
-            
-            $transactionId = (string)$responseXmlElement->DpsTxnRef; // use the DpsTxnRef of Complete
+        if (!$payment->hasAdditionalInformation()) {
+            $this->_logger->info(__METHOD__ . " orderId:{$orderId} additional_information is empty");
         }
+        $info = $payment->getAdditionalInformation();
 
+        $transactionId = $info["orderId"]; // ensure it is unique
         $payment->setTransactionId($transactionId);
         $payment->setIsTransactionClosed(1);
         $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $info);
@@ -140,16 +96,7 @@ class PaymentHelper
 
     public function canRefund($info)
     {
-        $this->_logger->info(__METHOD__);
-        $dpsTxnRefForRefund = $this->_paymentUtil->findDpsTxnRefForRefund($info);
-    
-        $canRefund = false;
-        if (isset($info["CardName"]) && $info["CardName"] != "Account2Account") {
-            $canRefund = !empty($dpsTxnRefForRefund);
-        }
-    
-        $this->_logger->info(__METHOD__ . " canRefund:{$canRefund} DpsTxnRefForRefund:{$dpsTxnRefForRefund}");
-        return $canRefund;
+        return true;
     }
     
     // Mage_Sales_Model_Order_Payment::refund

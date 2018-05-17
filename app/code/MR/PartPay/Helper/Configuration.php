@@ -24,6 +24,11 @@ class Configuration extends AbstractHelper
         $this->_logger = $objectManager->get("MR\PartPay\Logger\PartPayLogger");
     }
 
+    public function getPaymentType($storeId = null)
+    {
+        return 'Purchase';
+    }
+
     public function getModuleVersion()
     {
         if ($this->_moduleList == null)

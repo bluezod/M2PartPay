@@ -58,7 +58,8 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " partpayId:{$partpayId} storeId:{$storeId}");
 
         $partPayUrl = $this->_getApiUrl('/order/'. $partpayId, $storeId);
-        $response = $this->_sendRequest($partPayUrl);
+        $header = ['Authorization: Bearer ' . $this->_getAccessToken($storeId)];
+        $response = $this->_sendRequest($partPayUrl, $header);
 
         $this->_logger->info(__METHOD__ . " response:" . $response);
         return json_decode($response, true);

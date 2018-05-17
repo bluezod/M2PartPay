@@ -1,6 +1,6 @@
 <?php
 
-namespace MR\PartPay\Controller\PartPay;
+namespace MR\PartPay\Controller\Order;
 
 use Magento\Framework\App\Action\Context;
 

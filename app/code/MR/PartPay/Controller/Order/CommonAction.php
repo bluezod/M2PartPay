@@ -1,5 +1,5 @@
 <?php
-namespace MR\PartPay\Controller\PartPay;
+namespace MR\PartPay\Controller\Order;
 
 use Magento\Framework\App\Action\Context;
 use Symfony\Component\Filesystem\LockHandler;
@@ -77,21 +77,29 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         return;
     }
 
-    protected function _validateToken($orderId, $orderToken){
+    protected function _validateToken($partpayId, $orderToken){
 
         $requestTokenManager = $this->_objectManager->create("\MR\PartPay\Model\RequestToken");
-        $requestToken = $requestTokenManager->load($orderId, "order_id");
-        return $requestToken && $requestToken->getToken() == $orderToken;
+        $requestToken = $requestTokenManager->load($partpayId, "partpay_id");
+        return $requestToken->getId() && $requestToken->getToken() == $orderToken;
     }
 
     private function _handlePaymentResponse($success)
     {
-        $orderId = $this->getRequest()->getParam('order_id');
+        $orderIncrementId = $this->getRequest()->getParam('mage_order_id');
         $orderToken = $this->getRequest()->getParam('token');
-        $this->_logger->info(__METHOD__ . " order:{$orderId} token:{$orderToken} success:{$success}");
+        $partpayId = $this->getRequest()->getParam('orderId');
+
+        if(!$this->_validateToken($partpayId, $orderToken)) {
+            $error = "The token and payment ID do not match at PartPay side.";
+            $this->_logger->info($error);
+            $this->_redirectToCartPageWithError($error);
+            return;
+        }
+
+        $this->_logger->info(__METHOD__ . " order:{$orderIncrementId} token:{$orderToken} success:{$success}");
 
         /**
-         *
          * @var \Symfony\Component\Filesystem\LockHandler
          */
         $lockHandler = null;
@@ -106,18 +114,18 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
                 }
                 if ($triedTime > 40) { // 40 seconds should be enough
                     $this->_redirectToCartPageWithError("Failed to process the order, please contact support.");
-                    $this->_logger->critical(__METHOD__ . " lock timeout. order:{$orderId} token:{$orderToken} success:{$success} triedTime:{$triedTime}");
+                    $this->_logger->critical(__METHOD__ . " lock timeout. order:{$orderIncrementId} token:{$orderToken} success:{$success} triedTime:{$triedTime}");
                     return;
                 }
                 
                 $params['TriedTime'] = $triedTime + 1;
                 
-                $this->_logger->info( __METHOD__ . " redirecting to self, wait for lock release. order:{$orderId} token:{$orderToken} success:{$success} triedTime:{$triedTime}");
+                $this->_logger->info( __METHOD__ . " redirecting to self, wait for lock release. order:{$orderIncrementId} token:{$orderToken} success:{$success} triedTime:{$triedTime}");
                 sleep(1); // wait for sometime about lock release
                 return $this->_forward($action, null, null, $params);
             }
             
-            $this->_handlePaymentResponseWithoutLock($success, $orderId, $orderToken);
+            $this->_handlePaymentResponseWithoutLock($success, $orderIncrementId, $partpayId);
             $lockHandler->release();
         } catch (\Exception $e) {
             if (isset($lockHandler)) {
@@ -125,22 +133,22 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
             }
             
             $this->_logger->critical(__METHOD__ . "  " . "\n" . $e->getMessage() . $e->getTraceAsString());
-            $this->_redirectToCartPageWithError("Failed to processing the order, please contact support.");
+            $this->_redirectToCartPageWithError("Failed to process the order, please contact support.");
         }
     }
 
-    private function _handlePaymentResponseWithoutLock($success, $orderId, $orderToken)
+    private function _handlePaymentResponseWithoutLock($success, $orderIncrementId, $partpayId)
     {
-        $this->_logger->info(__METHOD__ . " order:{$orderId} token:{$orderToken} success:{$success}");
+        $this->_logger->info(__METHOD__ . " order:{$orderIncrementId} partpayId:{$partpayId} success:{$success}");
 
-        if (!$orderId) {
+        if (!$orderIncrementId) {
             $error = "The PartPay response does not contain an order ID. Order failed.";
             $this->_logger->info($error);
             $this->_redirectToCartPageWithError($error);
             return;
         }
 
-        $response = $this->_getTransactionStatus($orderId, $orderToken);
+        $response = $this->_getTransactionStatus($orderIncrementId, $partpayId);
         if (!$response) {
             return;
         }
@@ -148,15 +156,15 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         /**
          * @var \Magento\Quote\Model\Quote $quote
          */
-        $quote = $this->_loadQuote($orderId);
+        $quote = $this->_loadQuote($orderIncrementId);
         if ($quote == null) {
-            $error = "Failed to load quote from order: {$orderId}";
+            $error = "Failed to load quote from order: {$orderIncrementId}";
             $this->_logger->critical($error);
             $this->_redirectToCartPageWithError($error);
             return;
         }
 
-//            $this->_savePaymentResult($orderId, $orderToken, $quote, $response);
+//            $this->_savePaymentResult($orderIncrementId, $orderToken, $quote, $response);
         if (!$success || in_array($response['orderStatus'], ['Declined', 'Abandoned'])) {
             $payment = $quote->getPayment();
             $this->_savePaymentInfoForFailedPayment($payment);
@@ -167,7 +175,7 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
             return;
         }
 
-        return $this->_placeOrder($orderId, $quote, $response);
+        return $this->_placeOrder($orderIncrementId, $quote, $response);
     }
 
     private function _loadQuote($orderIncrementId)
@@ -295,23 +303,18 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         $this->_logger->info(__METHOD__ . " done");
     }
 
-    private function _getTransactionStatus($orderId, $orderToken)
+    private function _getTransactionStatus($orderIncrementId, $partpayId)
     {
-        $requestTokenManager = $this->_objectManager->create("\MR\PartPay\Model\RequestToken");
-        $requestToken = $requestTokenManager->getCollection()
-            ->addFieldToFilter('token', $orderToken)
-            ->addFieldToFilter('order_id', $orderId)
-            ->getFirstItem();
         try{
-            if(!$requestToken->getPartpayId()){
-                throw new \Magento\Framework\Exception\NotFoundException(__('Can\'t find the initial PartPay request token.'));
+            if(!$partpayId){
+                throw new \Magento\Framework\Exception\NotFoundException(__('Can\'t find the initial PartPay request ID.'));
             }
-            $response = $this->_communication->getTransactionStatus($orderId);
+            $response = $this->_communication->getTransactionStatus($orderIncrementId);
             if (!$response) { // defensive code. should never happen
                 throw new \Magento\Framework\Exception\NotFoundException(__('Transaction status checking response format is incorrect.'));
             }
         } catch (\Exception $ex) {
-            $this->_logger->critical(__METHOD__ . " order:{$orderId} token:{$orderToken} response format is incorrect");
+            $this->_logger->critical(__METHOD__ . " order:{$orderIncrementId} partpayId:{$partpayId} response format is incorrect");
             $this->_redirectToCartPageWithError("Failed to connect to PartPay checking transaction status. Please try again later.");
             return false;
         }

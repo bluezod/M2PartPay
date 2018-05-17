@@ -7,6 +7,6 @@ class PaymentResult extends AbstractDb
 {
     protected function _construct()
     {
-        $this->_init('paymentexpress_paymentresult', 'entity_id');
+        $this->_init('mr_partpay_paymentresult', 'entity_id');
     }
 }

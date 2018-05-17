@@ -43,8 +43,8 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__);
 
         $orderIncrementId = $requestData['merchantReference'];
-        $requestData['merchant']['redirectConfirmUrl'] = $this->_getUrl('partpay/order/success', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
-        $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
+        $requestData['merchant']['redirectConfirmUrl'] = $this->_getUrl('partpay/order/success', ['_secure' => true, '_nosid' => true, 'mage_order_id' => $orderIncrementId]);
+        $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'mage_order_id' => $orderIncrementId]);
 
         $this->_logger->info(__METHOD__ . " request: ". json_encode($requestData));
         $url = $this->_getApiUrl('order', $storeId);

@@ -1,7 +1,7 @@
 <?php
 namespace MR\PartPay\Block;
 
-use \Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\View\Element\Template\Context;
 
 class Info extends \Magento\Payment\Block\Info
 {
@@ -31,6 +31,9 @@ class Info extends \Magento\Payment\Block\Info
         $data = $this->getInfo()->getAdditionalInformation();
         $decodedData = [];
         foreach ($data as $key => $value) {
+            if (in_array($key, ['items', 'billing', 'shipping', 'merchant'])) {
+                continue;
+            }
         	if (strtotime($key)) {
                 $decodedValue = json_decode($value, true);
                 // TODO: deprecate unserialize completely
@@ -42,10 +45,9 @@ class Info extends \Magento\Payment\Block\Info
         		$decodedData[$key] = $value;
         	}
         }
-        
+
         $transport = parent::_prepareSpecificInformation($transport);
 
-        unset($decodedData["Currency"]);
         $this->_paymentSpecificInformation = $transport->setData(array_merge($decodedData, $transport->getData()));
 
         return $this->_paymentSpecificInformation;

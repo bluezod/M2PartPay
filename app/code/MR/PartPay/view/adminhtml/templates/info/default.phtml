@@ -7,7 +7,7 @@
 		<tr>
 		<td colspan="3"><?php echo $block->escapeHtml($_label)?>:</td>
 	</tr>
-		
+
 		<?php foreach ($_value as $_subKey => $_subValue):?>
 			<tr>
 		<td></td>
@@ -15,7 +15,7 @@
 		<td><?php echo nl2br(implode($block->getValueAsArray($_subValue, true), "\n"))?></td>
 	</tr>
 		<?php endforeach; ?>
-		
+
 	<?php else: ?>
 		<tr>
 		<td><?php echo $block->escapeHtml($_label)?>:</td>

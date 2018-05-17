@@ -47,10 +47,10 @@ class Communication extends AbstractHelper
         $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
 
         $this->_logger->info(__METHOD__ . " request: ". json_encode($requestData));
-        $url = $this->_configuration->getPartPayApiEndpoint($storeId);
+        $url = $this->_getApiUrl('order', $storeId);
         $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
-        $response = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, $requestData);
-        return json_decode($response);
+        $response = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($requestData));
+        return json_decode($response, true);
     }
 
     public function getTransactionStatus($userId, $token, $storeId = null)
@@ -120,7 +120,7 @@ class Communication extends AbstractHelper
             $url = $this->_configuration->getPartPayAuthTokenEndpoint($storeId);
 
             try {
-                $accessTokenResult = json_decode($this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam)));
+                $accessTokenResult = json_decode($this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam)), true);
             } catch (\Exception $ex) {
                 $this->_logger->error($ex->getMessage());
                 return false;

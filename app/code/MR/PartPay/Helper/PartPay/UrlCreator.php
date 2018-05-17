@@ -102,14 +102,14 @@ class UrlCreator
                 'description' => $product->getDescription(),
                 'name' => $item->getName(),
                 'sku' => $item->getSku(),
-                'quantity' => $item->getQtyOrdered(),
+                'quantity' => $item->getQty(),
                 'price' => $item->getBaseRowTotalInclTax(),
             );
         }
 
         $param['merchantReference'] = $orderIncrementId;
-        $param['taxAmount'] = $quote->getTaxAmount();
-        $param['shippingAmount'] = $quote->getShippingAmount();
+        $param['taxAmount'] = $quote->getShippingAddress()->getBaseTaxAmount();
+        $param['shippingAmount'] = $quote->getShippingAddress()->getBaseShippingAmount();
 
         $this->_logger->info(__METHOD__ . " param:" . var_export($param, true));
         return $param;

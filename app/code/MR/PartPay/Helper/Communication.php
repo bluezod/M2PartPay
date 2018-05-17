@@ -53,16 +53,15 @@ class Communication extends AbstractHelper
         return json_decode($response, true);
     }
 
-    public function getTransactionStatus($userId, $token, $storeId = null)
+    public function getTransactionStatus($partpayId, $storeId = null)
     {
-        $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} storeId:{$storeId}");
-        $requestXml = $this->_buildProcessResponseRequest($userId, $token);
+        $this->_logger->info(__METHOD__ . " partpayId:{$partpayId} storeId:{$storeId}");
 
-        $pxPayUrl = $this->_configuration->getPartPayApiEndpoint($storeId);
-        $responseXml = $this->_sendRequest($requestXml, $pxPayUrl);
+        $partPayUrl = $this->_getApiUrl('/order/'. $partpayId, $storeId);
+        $response = $this->_sendRequest($partPayUrl);
 
-        $this->_logger->info(__METHOD__ . " responseXml:" . $responseXml);
-        return $responseXml;
+        $this->_logger->info(__METHOD__ . " response:" . $response);
+        return json_decode($response, true);
     }
 
     public function refund($amount, $currency, $dpsTxnRef, $storeId)

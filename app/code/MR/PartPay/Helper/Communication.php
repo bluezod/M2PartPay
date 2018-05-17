@@ -42,12 +42,13 @@ class Communication extends AbstractHelper
         $orderIncrementId = $requestData['merchantReference'];
         $requestData['merchant']['redirectConfirmUrl'] = $this->_getUrl('partpay/order/success', ['_secure' => true, '_nosid' => true, 'mage_order_id' => $orderIncrementId]);
         $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'mage_order_id' => $orderIncrementId]);
+        $requestData = json_encode($requestData);
 
-        $this->_logger->info(__METHOD__ . " request: ". json_encode($requestData));
+        $this->_logger->info(__METHOD__ . " request: ". $requestData);
         $url = $this->_getApiUrl('order', $storeId);
         $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
-        $response = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($requestData));
-        return json_decode($response, true);
+        $result = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, $requestData);
+        return json_decode($result['response'], true);
     }
 
     public function getTransactionStatus($partpayId, $storeId = null)
@@ -56,27 +57,24 @@ class Communication extends AbstractHelper
 
         $partPayUrl = $this->_getApiUrl('/order/'. $partpayId, $storeId);
         $header = ['Authorization: Bearer ' . $this->_getAccessToken($storeId)];
-        $response = $this->_sendRequest($partPayUrl, $header);
-
-        $this->_logger->info(__METHOD__ . " response:" . $response);
-        return json_decode($response, true);
+        $result = $this->_sendRequest($partPayUrl, $header);
+        return json_decode($result['response'], true);
     }
 
     public function refund($orderIncrementId, $partpayId, $amount, $storeId = null)
     {
         $this->_logger->info(__METHOD__ . "order:{$orderIncrementId} partpayId:{$partpayId} storeId:{$storeId}");
 
-
-        $requestData = [
+        $requestData = json_encode([
             'amount'=> $amount,
             'merchantRefundReference' => $orderIncrementId.'-'.$amount.' '.$this->_date->date(),
-            ];
+            ]);
+        $this->_logger->info(__METHOD__ . " request: ". $requestData);
         $partPayUrl = $this->_getApiUrl('/order/' . $partpayId . '/refund/', $storeId);
-        $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
-        $response = $this->_sendRequest($partPayUrl, $header, [],\Magento\Framework\HTTP\ZendClient::POST, $requestData);
 
-        $this->_logger->info(__METHOD__ . " response:" . $response);
-        return json_decode($response, true);
+        $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
+        $result = $this->_sendRequest($partPayUrl, $header, [],\Magento\Framework\HTTP\ZendClient::POST, $requestData);
+        return $result;
     }
 
     protected function _getAccessToken($storeId = null)
@@ -95,16 +93,17 @@ class Communication extends AbstractHelper
             $url = $this->_configuration->getPartPayAuthTokenEndpoint($storeId);
 
             try {
-                $accessTokenResult = json_decode($this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam)), true);
+                $accessTokenResult = $this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam));
+                $response = json_decode($accessTokenResult, true);
             } catch (\Exception $ex) {
                 $this->_logger->error($ex->getMessage());
                 return false;
             }
-            if (!$accessTokenResult || !isset($accessTokenResult['access_token'])) {
+            if (!$response || !isset($response['access_token'])) {
                 $errorMessage = 'Can\'t get PartPay AccessToken with the credential.';
                 throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
             }
-            $this->_accessToken = $accessTokenResult['access_token'];
+            $this->_accessToken = $response['access_token'];
         }
         return $this->_accessToken;
     }
@@ -147,21 +146,26 @@ class Communication extends AbstractHelper
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $response = curl_exec($ch);
-        if (!$response) {
+        $errorNo = curl_errno($ch);
+        $errorMessage = '';
+        if($errorNo){
             $errorMessage = " Error:" . curl_error($ch) . " Error Code:" . curl_errno($ch);
             $this->_logger->critical(__METHOD__ . $errorMessage);
-        } else {
-            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($httpcode && substr($httpcode, 0, 2) != "20") {
-                $errorMessage = " HTTP CODE: {$httpcode} for URL: {$url}";
-                $this->_logger->critical(__METHOD__ . $errorMessage);
-            }
         }
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpcode && substr($httpcode, 0, 2) != "20") {
+            $errorMessage = " HTTP CODE: {$httpcode} for URL: {$url}";
+            $this->_logger->critical(__METHOD__ . $errorMessage);
+        }
+        $result = [
+            'httpcode' => $httpcode,
+            'response' => $response,
+            'errmsg' => $errorMessage,
+        ];
         curl_close($ch);
 
-        $this->_logger->info(__METHOD__ . " response from PartPay:" . $response);
-
-        return $response;
+        $this->_logger->info(__METHOD__ . " response from PartPay - HttpCode:{$httpcode} Body:{$response}");
+        return $result;
     }
 
     private function _buildRefundRequestXml($amount, $currency, $dpsTxnRef, $storeId = null)

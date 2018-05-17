@@ -39,38 +39,27 @@ class PaymentUtil extends AbstractHelper
         return $url;
     }
 
-    public function saveInvalidResponse($payment, $responseText)
+    public function saveInvalidResponse($payment, $partpayId, $responseText)
     {
         $this->_logger->info(__METHOD__ . " responseText:{$responseText}");
-        $info = [];
-        $info["Error"] = $responseText;
+        $info = [
+            "PartPayID" => $partpayId,
+            "Error" => $responseText,
+        ];
         $payment->setAdditionalInformation(date("Y-m-d H:i:s"), json_encode($info));
         $payment->save();
         return $info;
     }
 
-    public function savePxPostResponse($payment, $responseXmlElement)
+    public function savePartPayRefundResponse($payment, $partpayId, $responseBody)
     {
-        $this->_logger->info(__METHOD__);
-        $info = [];
-        $transactionXmlElement = $responseXmlElement->Transaction;
-        if ($transactionXmlElement) {
-            $info["DpsTransactionType"] = (string)$transactionXmlElement->TxnType;
-            $info["ReCo"] = (string)$transactionXmlElement->ReCo;
-        } else {
-            $info["ReCo"] = (string)$responseXmlElement->ReCo;
-        }
-        $info["DpsTxnRef"] = (string)$responseXmlElement->DpsTxnRef;
-        $info["DpsResponseText"] = (string)$responseXmlElement->ResponseText;
-        $responseCardName = (string)$responseXmlElement->CardName;
-        if (!empty($responseCardName)) {
-        	// Complete/Refund does not provide this field, and we don't want to show empty field
-        	$info["CardName"] = (string)$responseXmlElement->CardName;
-        }
-        
+        $this->_logger->info(__METHOD__ . " responseBody:{$responseBody}");
+        $info = [
+            'OrderRefunded' => $partpayId,
+        ];
         $payment->setAdditionalInformation(date("Y-m-d H:i:s"), json_encode($info));
         $payment->save();
-        
+
         return $info;
     }
 

@@ -96,7 +96,7 @@ class PaymentHelper
         $info = $payment->getAdditionalInformation();
         $orderIncrementId = $payment->getOrder()->getIncrementId();
         $partpayId = $this->_paymentUtil->findPartPayOrderForRefund($orderIncrementId, $info);
-        $response = $this->_communication->refund($orderIncrementId, $partpayId, $amount, $storeId);
+        $apiResult = $this->_communication->refund($orderIncrementId, $partpayId, $amount, $storeId);
     
         $orderId = "unknown";
         $order = $payment->getOrder();
@@ -104,21 +104,15 @@ class PaymentHelper
             $orderId = $order->getIncrementId();
         }
         $this->_logger->info(__METHOD__ . " orderId:{$orderId}");
-    
-        if (!$response) {
-            $this->_paymentUtil->saveInvalidResponse($payment, $response);
-            $errorMessage = " Failed to refund order:{$orderId}, response from PartPay: " . json_encode($response);
+
+        $response = $apiResult['response'];
+        if ($apiResult['errmsg']) {
+            $errorMessage = " Failed to refund order:{$orderId}, {$apiResult['errmsg']}, response from PartPay: " . $response;
+            $this->_paymentUtil->saveInvalidResponse($payment, $partpayId, $errorMessage);
             $this->_logger->critical(__METHOD__ . $errorMessage);
             throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
         }
     
-        $this->_paymentUtil->savePxPostResponse($payment, $response);
-    
-        if (!isset($response['amount']) || !$response['amount'] || $response['amount'] != $amount) {
-            $errorMessage = " Failed to refund order:{$orderId}. response from PartPay: " . json_encode($response);
-            $this->_logger->critical(__METHOD__ . $errorMessage);
-            throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
-        }
-    
+        $this->_paymentUtil->savePartPayRefundResponse($payment, $partpayId, $response);
     }
 }

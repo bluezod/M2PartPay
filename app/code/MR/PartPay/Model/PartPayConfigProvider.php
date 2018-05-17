@@ -40,12 +40,13 @@ class PartPayConfigProvider implements ConfigProviderInterface
         $quote = $session->getQuote();
         $quoteId = $quote->getId();
         
-        $customerSession = $this->_objectManager->get("\Magento\Customer\Model\Session"); $paymentUtil = $this->_objectManager->get("\MR\PartPay\Helper\PaymentUtil");
+//        $customerSession = $this->_objectManager->get("\Magento\Customer\Model\Session");
+        $paymentUtil = $this->_objectManager->get("\MR\PartPay\Helper\PaymentUtil");
 
         
         return [
             'payment' => [
-                'paymentexpress' => [
+                'partpay' => [
                     'redirectUrl' => $paymentUtil->buildRedirectUrl($quoteId),
                     'method' => \MR\PartPay\Model\Payment::MR_PARTPAY_CODE
                 ]

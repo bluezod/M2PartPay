@@ -46,11 +46,11 @@ class Communication extends AbstractHelper
         $requestData['merchant']['redirectConfirmUrl'] = $this->_getUrl('partpay/order/success', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
         $requestData['merchant']['redirectCancelUrl'] = $this->_getUrl('partpay/order/fail', ['_secure' => true, '_nosid' => true, 'order_id' => $orderIncrementId]);
 
-        $this->_logger->info(__METHOD__ . " request: {$requestData}");
+        $this->_logger->info(__METHOD__ . " request: ". json_encode($requestData));
         $url = $this->_configuration->getPartPayApiEndpoint($storeId);
         $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
         $response = $this->_sendRequest($url, $header, [], \Magento\Framework\HTTP\ZendClient::POST, $requestData);
-        return $this->_parseResult($response);
+        return json_decode($response);
     }
 
     public function getTransactionStatus($userId, $token, $storeId = null)
@@ -115,12 +115,21 @@ class Communication extends AbstractHelper
             ];
 
             $headers = [
-                'Content-Type' => 'application/json'
+                'Content-Type: application/json'
             ];
             $url = $this->_configuration->getPartPayAuthTokenEndpoint($storeId);
 
-            $accessTokenResult = $this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam));
-            $this->_accessToken = $this->_parseResult($accessTokenResult)['access_token'];
+            try {
+                $accessTokenResult = json_decode($this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam)));
+            } catch (\Exception $ex) {
+                $this->_logger->error($ex->getMessage());
+                return false;
+            }
+            if (!$accessTokenResult || !isset($accessTokenResult['access_token'])) {
+                $errorMessage = 'Can\'t get PartPay AccessToken with the credential.';
+                throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
+            }
+            $this->_accessToken = $accessTokenResult['access_token'];
         }
         return $this->_accessToken;
     }
@@ -164,7 +173,6 @@ class Communication extends AbstractHelper
         curl_setopt($ch, CURLOPT_TIMEOUT, 180);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 

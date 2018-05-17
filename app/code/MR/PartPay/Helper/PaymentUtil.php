@@ -35,7 +35,7 @@ class PaymentUtil extends AbstractHelper
     {
         $this->_logger->info(__METHOD__);
         $urlManager = $this->_objectManager->get('\Magento\Framework\Url');
-        $url = $urlManager->getUrl('pxpay2/order/redirect', ['_secure' => true]);
+        $url = $urlManager->getUrl('partpay/order/redirect', ['_secure' => true]);
         
         $this->_logger->info(__METHOD__ . " url: {$url} ");
         return $url;

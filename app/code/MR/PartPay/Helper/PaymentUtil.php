@@ -1,11 +1,9 @@
 <?php
 namespace MR\PartPay\Helper;
 
-use \Magento\Framework\App\Helper\AbstractHelper;
-use \Magento\Framework\App\Helper\Context;
-use \Magento\Customer\Api\CustomerRepositoryInterface;
-use \Magento\Customer\Api\AccountManagementInterface;
-    
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+
 class PaymentUtil extends AbstractHelper
 {
 
@@ -76,54 +74,6 @@ class PaymentUtil extends AbstractHelper
         return $info;
     }
 
-    public function formatCurrency($amount, $currencyCode)
-    {
-        $exponents = [
-            "BYR" => 0,
-            "XOF" => 0,
-            "XOF" => 0,
-            "BIF" => 0,
-            "XAF" => 0,
-            "XAF" => 0,
-            "XAF" => 0,
-            "KMF" => 0,
-            "XAF" => 0,
-            "XOF" => 0,
-            "DJF" => 0,
-            "XAF" => 0,
-            "XPF" => 0,
-            "XAF" => 0,
-            "GNF" => 0,
-            "JPY" => 0,
-            "KRW" => 0,
-            "XOF" => 0,
-            "XPF" => 0,
-            "XOF" => 0,
-            "PYG" => 0,
-            "RWF" => 0,
-            "XOF" => 0,
-            "XOF" => 0,
-            "VUV" => 0,
-            "XPF" => 0,
-            "BHD" => 3,
-            "IQD" => 3,
-            "JOD" => 3,
-            "KWD" => 3,
-            "LYD" => 3,
-            "OMR" => 3,
-            "TND" => 3
-        ];
-        $exponent = 2;
-        if (array_key_exists($currencyCode, $exponents)) {
-            $exponent = $exponents[$currencyCode];
-        }
-        
-        $formatedAmount = number_format($amount, $exponent, ".", '');
-        
-        $this->_logger->info(__METHOD__ . " from:{$amount} to: {$formatedAmount}  Currency:{$currencyCode}");
-        return $formatedAmount;
-    }
-
     public function loadOrderById($orderId)
     {
         $this->_logger->info(__METHOD__ . " orderId:{$orderId}");
@@ -136,44 +86,6 @@ class PaymentUtil extends AbstractHelper
             return null;
         }
         return $order;
-    }
-
-    public function buildPxPayRequestData($order, $transactionType, $forceA2A)
-    {
-        $orderIncrementId = $order->getIncrementId();
-        $this->_logger->info(__METHOD__ . " orderIncrementId:{$orderIncrementId} transactionType:{$transactionType} forceA2A:{$forceA2A}");
-        
-        $currency = $order->getOrderCurrencyCode();
-        $amount = $order->getBaseGrandTotal();
-        
-        $additionalInfo = [];
-        $quoteId = $order->getQuoteId();
-        
-        $payment = $order->getPayment();
-        $additionalInfo = $payment->getAdditionalInformation();
-        
-        $dataBag = $this->_objectManager->create("\Magento\Framework\DataObject");
-        $dataBag->setForceA2A(false);
-        if ($transactionType == "Purchase" && $forceA2A) {
-            $dataBag->setForceA2A(true);
-        }
-        
-        // <TxnId>ABC123</TxnId>
-        // <TxnData1>John Doe</TxnData1>
-        // <TxnData2>0211111111</TxnData2>
-        // <TxnData3>98 Anzac Ave, Auckland 1010</TxnData3>
-        
-        $dataBag->setAmount($amount);
-        $dataBag->setCurrency($currency);
-        $dataBag->setTransactionType($transactionType);
-        $dataBag->setOrderIncrementId($orderIncrementId);
-        $dataBag->setOrderId($order->getId());
-        
-        $customerInfo = $this->loadCustomerInfo($order);
-        $dataBag->setCustomerInfo($customerInfo);
-        
-        $this->_logger->info(__METHOD__ . " dataBag:" . var_export($dataBag, true));
-        return $dataBag;
     }
 
     public function loadCustomerInfo($order)
@@ -203,59 +115,16 @@ class PaymentUtil extends AbstractHelper
         return $customerInfo;
     }
 
-    public function loadSavedCards($customerId)
-    {
-        $this->_logger->info(__METHOD__ . " customerId:{$customerId}");
-        
-        $billingModel = $this->_objectManager->create("\PaymentExpress\PxPay2\Model\BillingToken");
-        
-        $billingModelCollection = $billingModel->getCollection()->addFieldToFilter('customer_id', $customerId);
-        
-        $billingModelCollection->getSelect()->group(['masked_card_number', 'cc_expiry_date']);
-        return $billingModelCollection;
-    }
-
-    public function deleteCards($customerId, $cardNumber, $expiryDate)
-    {
-        $this->_logger->info(__METHOD__ . " customerId:{$customerId} cardNumber:{$cardNumber} expiryDate:{$expiryDate}");
-        
-        $billingModel = $this->_objectManager->create("\PaymentExpress\PxPay2\Model\BillingToken");
-        
-        $billingModelCollection = $billingModel->getCollection()
-            ->addFieldToFilter('customer_id', $customerId)
-            ->addFieldToFilter('masked_card_number', $cardNumber)
-            ->addFieldToFilter('cc_expiry_date', $expiryDate);
-        $billingModelCollection->walk('delete');
-    }
-
-    public function findDpsTxnRefForRefund($info)
+    public function findPartPayOrderForRefund($orderIncrementId, $info)
     {
         $this->_logger->info(__METHOD__);
-        $dpxTxnRef = "";
-        if (isset($info["DpsTransactionType"])) {
-            
-            if ($info["DpsTransactionType"] == "Purchase") {
-                $dpxTxnRef = $info["DpsTxnRef"];
-                $this->_logger->info(__METHOD__ . " DpsTransactionType:Purchase DpsTxnRef: {$dpxTxnRef}");
-                return $dpxTxnRef;
-            }
-            
-            foreach ($info as $key => $value) {
-                if (strtotime($key)) {
-                    $decodedValue = json_decode($value, true);
-                    // TODO: deprecate unserialize
-                    if (json_last_error() != JSON_ERROR_NONE)
-                        $decodedValue = unserialize($value);
-
-                    if ($decodedValue["DpsTransactionType"] == "Complete") {
-                        $dpxTxnRef = $decodedValue["DpsTxnRef"];
-                        $this->_logger->info(__METHOD__ . " DpsTransactionType:Complete  DpsTxnRef: {$dpxTxnRef}");
-                        return $dpxTxnRef;
-                    }
-                }
-            }
+        $partpayId = "";
+        if (isset($info["orderId"])) {
+            $partpayId = $info["orderId"];
+            $this->_logger->info(__METHOD__ . "order:{$orderIncrementId} PartPayID: {$partpayId}");
+            return $partpayId;
         }
-        $this->_logger->info(__METHOD__ . " DpsTxnRef not found");
-        return $dpxTxnRef;
+        $this->_logger->info(__METHOD__ . " PartPayID not found");
+        return $partpayId;
     }
 }

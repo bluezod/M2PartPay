@@ -66,11 +66,6 @@ class PaymentHelper
         return $paymentAction;
     }
 	
-	public function canCapture($storeId, $info)
-	{
-		return true;
-	}
-	
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount, $storeId)
     {
         // refer to Magento\Sales\Model\Order\Payment\Transaction\Builder::build for which fields should be set.
@@ -93,22 +88,15 @@ class PaymentHelper
         $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $info);
     }
     
-
-    public function canRefund($info)
-    {
-        return true;
-    }
-    
     // Mage_Sales_Model_Order_Payment::refund
     // use getInfoInstance to get object of Mage_Payment_Model_Info (Mage_Payment_Model_Info::getMethodInstance Mage_Sales_Model_Order_Payment is sub class of Mage_Payment_Model_Info)
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount, $storeId)
     {
         $this->_logger->info(__METHOD__);
         $info = $payment->getAdditionalInformation();
-        $dpsTxnRef = $this->_paymentUtil->findDpsTxnRefForRefund($info);
-        $currency = $info["Currency"];
-        $responseXml = $this->_communication->refund($amount, $currency, $dpsTxnRef, $storeId);
-        $responseXmlElement = simplexml_load_string($responseXml);
+        $orderIncrementId = $payment->getOrder()->getIncrementId();
+        $partpayId = $this->_paymentUtil->findPartPayOrderForRefund($orderIncrementId, $info);
+        $response = $this->_communication->refund($orderIncrementId, $partpayId, $amount, $storeId);
     
         $orderId = "unknown";
         $order = $payment->getOrder();
@@ -117,17 +105,17 @@ class PaymentHelper
         }
         $this->_logger->info(__METHOD__ . " orderId:{$orderId}");
     
-        if (!$responseXmlElement) {
-            $this->_paymentUtil->saveInvalidResponse($payment, $responseXml);
-            $errorMessage = " Failed to refund order:{$orderId}, response from paymentexpress: {$responseXml}";
+        if (!$response) {
+            $this->_paymentUtil->saveInvalidResponse($payment, $response);
+            $errorMessage = " Failed to refund order:{$orderId}, response from PartPay: " . json_encode($response);
             $this->_logger->critical(__METHOD__ . $errorMessage);
             throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
         }
     
-        $this->_paymentUtil->savePxPostResponse($payment, $responseXmlElement);
+        $this->_paymentUtil->savePxPostResponse($payment, $response);
     
-        if (!$responseXmlElement->Transaction || $responseXmlElement->Transaction["success"] != "1") {
-            $errorMessage = " Failed to refund order:{$orderId}. response from paymentexpress: {$responseXml}";
+        if (!isset($response['amount']) || !$response['amount'] || $response['amount'] != $amount) {
+            $errorMessage = " Failed to refund order:{$orderId}. response from PartPay: " . json_encode($response);
             $this->_logger->critical(__METHOD__ . $errorMessage);
             throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
         }

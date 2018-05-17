@@ -20,11 +20,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_isGateway = true;
 
-    protected $_canAuthorize = true;
-
     protected $_canCapture = true;
-
-    protected $_canCapturePartial = true;
 
     protected $_canUseInternal = false;
 
@@ -32,7 +28,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_canUseForMultishipping = false;
 
-    protected $_canRefund = false;
+    protected $_canRefund = true;
 
     /**
      * 
@@ -114,30 +110,13 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         return $this->_paymentHelper->getConfigPaymentAction($this->getStore());
     }
-    
-    public function canCapture()
-    {
-        $payment = $this->getInfoInstance();
-        $info = $payment->getAdditionalInformation();
-        $this->_canCapture =  $this->_paymentHelper->canCapture($this->getStore(), $info);
-        return $this->_canCapture;
-    }
-    
+
     // Invoked by Mage_Sales_Model_Order_Payment::capture
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->_logger->info(__METHOD__ . " payment amount:" . $amount);
         $this->_paymentHelper->capture($payment, $amount, $this->getStore());
         return $this;
-    }
-
-    public function canRefund()
-    {
-        $this->_logger->info(__METHOD__);
-        $payment = $this->getInfoInstance();
-        $info = $payment->getAdditionalInformation();
-        $this->_canRefund = $this->_paymentHelper->canRefund($info);
-        return $this->_canRefund;
     }
     
     // Mage_Sales_Model_Order_Payment::refund

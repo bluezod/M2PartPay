@@ -7,12 +7,6 @@ use Magento\Framework\App\Helper\Context;
 
 class Communication extends AbstractHelper
 {
-
-    private $_sensitiveFields = [
-        "PxPayKey",
-        "PostPassword"
-    ];
-
     /**
      *
      * @var \MR\PartPay\Helper\PaymentUtil
@@ -21,13 +15,15 @@ class Communication extends AbstractHelper
 
     private $_accessToken;
 
+    private $_date;
+
     /**
      *
      * @var \MR\PartPay\Helper\Configuration
      */
     private $_configuration;
 
-    public function __construct(Context $context)
+    public function __construct(Context $context, \Magento\Framework\Stdlib\DateTime\DateTime $date)
     {
         parent::__construct($context);
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -36,6 +32,7 @@ class Communication extends AbstractHelper
         $this->_paymentUtil = $objectManager->get("\MR\PartPay\Helper\PaymentUtil");
         $this->_logger->info(__METHOD__);
         $this->_accessToken = null;
+        $this->_date = $date;
     }
 
     public function getPartPayPage($requestData, $storeId = null)
@@ -65,43 +62,21 @@ class Communication extends AbstractHelper
         return json_decode($response, true);
     }
 
-    public function refund($amount, $currency, $dpsTxnRef, $storeId)
+    public function refund($orderIncrementId, $partpayId, $amount, $storeId = null)
     {
-        $this->_logger->info(__METHOD__ . " amount:{$amount} currency:{$currency} dpsTxnRef:{$dpsTxnRef} storeId:{$storeId}");
-        $requestXml = $this->_buildRefundRequestXml($amount, $currency, $dpsTxnRef, $storeId);
-        $url = $this->_configuration->getPxPostUrl($storeId);
+        $this->_logger->info(__METHOD__ . "order:{$orderIncrementId} partpayId:{$partpayId} storeId:{$storeId}");
 
-        return $this->_sendRequest($requestXml, $url);
-    }
 
-    public function complete($amount, $currency, $dpsTxnRef, $storeId)
-    {
-        $this->_logger->info(__METHOD__ . " amount:{$amount} currency:{$currency} dpsTxnRef:{$dpsTxnRef} storeId:{$storeId}");
-        $requestXml = $this->_buildCompleteRequestXml($amount, $currency, $dpsTxnRef, $storeId);
-        $url = $this->_configuration->getPxPostUrl($storeId);
+        $requestData = [
+            'amount'=> $amount,
+            'merchantRefundReference' => $orderIncrementId.'-'.$amount.' '.$this->_date->date(),
+            ];
+        $partPayUrl = $this->_getApiUrl('/order/' . $partpayId . '/refund/', $storeId);
+        $header = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->_getAccessToken($storeId)];
+        $response = $this->_sendRequest($partPayUrl, $header, [],\Magento\Framework\HTTP\ZendClient::POST, $requestData);
 
-        return $this->_sendRequest($requestXml, $url);
-    }
-
-    private function _buildProcessResponseRequest($userId, $token)
-    {
-        $this->_logger->info(__METHOD__ . " pxPayUserId:{$userId} token:{$token}");
-        $pxPayKey = "";
-        if ($userId == $this->_configuration->getPartPayClientId()) {
-            $pxPayKey = $this->_configuration->getPartPayClientSecret();
-        }
-
-        $requestObject = new \SimpleXMLElement("<ProcessResponse></ProcessResponse>");
-        $requestObject->addChild("PxPayUserId", $userId);
-        $requestObject->addChild("PxPayKey", $pxPayKey);
-        $requestObject->addChild("Response", $token);
-        $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
-
-        $requestXml = $requestObject->asXML();
-
-        $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
-
-        return $requestXml;
+        $this->_logger->info(__METHOD__ . " response:" . $response);
+        return json_decode($response, true);
     }
 
     protected function _getAccessToken($storeId = null)
@@ -139,11 +114,6 @@ class Communication extends AbstractHelper
         $baseUrl = $this->_configuration->getPartPayApiEndpoint($storeId);
         $apiUrl = rtrim($baseUrl, '/') . '/' . trim($path, '/');
         return $apiUrl;
-    }
-
-    protected function _parseResult($response)
-    {
-        return json_decode($response->getBody());
     }
 
     private function _sendRequest($url, $header = [], $params = [], $method = \Magento\Framework\HTTP\ZendClient::GET, $postBody = null)
@@ -198,53 +168,5 @@ class Communication extends AbstractHelper
     {
         $this->_logger->info(__METHOD__);
         return $requestObject = $this->_buildPxPostRequestXml($amount, $currency, $dpsTxnRef, "Refund", $storeId);
-    }
-
-    private function _buildCompleteRequestXml($amount, $currency, $dpsTxnRef, $storeId = null)
-    {
-        $this->_logger->info(__METHOD__);
-        return $this->_buildPxPostRequestXml($amount, $currency, $dpsTxnRef, "Complete", $storeId);
-    }
-
-    private function _buildPxPostRequestXml($amount, $currency, $dpsTxnRef, $dpsTxnType, $storeId)
-    {
-        // <Txn>
-        // <PostUsername>Pxpay_HubertFu</PostUsername>
-        // <PostPassword>TestPassword</PostPassword>
-        // <Amount>1.23</Amount>
-        // <InputCurrency>NZD</InputCurrency>
-        // <TxnType>Complete</TxnType>
-        // <DpsTxnRef>000000600000005b</DpsTxnRef>
-        // </Txn>
-        $this->_logger->info(__METHOD__);
-        $username = $this->_configuration->getPxPostUsername($storeId);
-        $password = $this->_configuration->getPxPassword($storeId);
-
-        $formattedAmount = $this->_paymentUtil->formatCurrency($amount, $currency);
-        $requestObject = new \SimpleXMLElement("<Txn></Txn>");
-        $requestObject->addChild("PostUsername", $username);
-        $requestObject->addChild("PostPassword", $password);
-        $requestObject->addChild("InputCurrency", $currency);
-        $requestObject->addChild("Amount", $formattedAmount);
-        $requestObject->addChild("DpsTxnRef", $dpsTxnRef);
-        $requestObject->addChild("TxnType", $dpsTxnType);
-        $requestObject->addChild("ClientVersion", $this->_configuration->getModuleVersion());
-
-        $requestXml = $requestObject->asXML();
-
-        $this->_logger->info(__METHOD__ . " request: {$this->_obscureSensitiveFields($requestObject)}");
-
-        return $requestXml;
-    }
-
-    private function _obscureSensitiveFields($requestObject)
-    {
-        foreach ($requestObject->children() as $child) {
-            $name = $child->getName();
-            if (in_array($name, $this->_sensitiveFields)) {
-                $child[0] = "****";
-            }
-        }
-        return $requestObject->asXML();
     }
 }

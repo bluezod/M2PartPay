@@ -56,6 +56,20 @@ class UrlCreator
             $this->_logger->critical(__METHOD__ . " " . $error);
             return false;
         }
+
+        $requestTokenModel = $this->_objectManager->create("\MR\PartPay\Model\RequestToken");
+        $requestTokenModel->setData(
+            array(
+                "token" => $response['token'],
+                "url" => $response['redirectUrl'],
+                "expire" => $response['expiryDateTime'],
+                "order_id" => $quote->getReservedOrderId(),
+                "partpay_id" => $response['orderId'],
+            ));
+
+        $requestTokenModel->save();
+        $session = $this->_objectManager->get('\Magento\Checkout\Model\Session');
+        $session->setPartpayQuoteId($session->getQuote()->getId());
         return (string)$response['redirectUrl'];
     }
 

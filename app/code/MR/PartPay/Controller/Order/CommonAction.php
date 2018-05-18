@@ -248,7 +248,7 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         $info = $this->_clearPaymentParameters($info);
         $info = array_merge($info, $response);
         
-        $payment->unsAdditionalInformation(); // ensure DpsBillingId is not saved to database.
+        $payment->unsAdditionalInformation();
         $payment->setAdditionalInformation($info);
         
         $info = $payment->getAdditionalInformation();
@@ -263,7 +263,7 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
     
         $info = $this->_clearPaymentParameters($info);
 
-        $payment->unsAdditionalInformation(); // ensure DpsBillingId is not saved to database.
+        $payment->unsAdditionalInformation();
         $payment->setAdditionalInformation($info);
         $payment->save();
     }

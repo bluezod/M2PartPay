@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Backend/etc/menu.xsd">
-    <menu>
-        <add id="MR_PartPay::parent" title="PartPay" module="MR_PartPay" sortOrder="100" resource="MR_PartPay::parent"/>
-        <add id="MR_PartPay::index" title="PartPay Index" module="MR_PartPay" sortOrder="10" action="partpay/index" resource="MR_PartPay::index" parent="MR_PartPay::parent"/>
-		
-    </menu>
-</config>

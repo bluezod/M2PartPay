@@ -167,10 +167,4 @@ class Communication extends AbstractHelper
         $this->_logger->info(__METHOD__ . " response from PartPay - HttpCode:{$httpcode} Body:{$response}");
         return $result;
     }
-
-    private function _buildRefundRequestXml($amount, $currency, $dpsTxnRef, $storeId = null)
-    {
-        $this->_logger->info(__METHOD__);
-        return $requestObject = $this->_buildPxPostRequestXml($amount, $currency, $dpsTxnRef, "Refund", $storeId);
-    }
 }

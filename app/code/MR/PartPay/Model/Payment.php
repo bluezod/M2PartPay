@@ -82,13 +82,6 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $this->_logger->info(__METHOD__ . " data:" . var_export($data, true));
         $infoInstance = $this->getInfoInstance();
-
-        $info = $infoInstance->getAdditionalInformation();
-        if (isset($info) && !empty($info['DpsTxnRef'])){
-            $this->_logger->info(__METHOD__ . " payment finished. DpsTxnRef:" . $info['DpsTxnRef']);
-            return $this; //The transaction is processed.
-        }
-        
         $source = $data;
         if (isset($data['additional_data'])){
             $source = $this->_objectManager->create("\Magento\Framework\DataObject");

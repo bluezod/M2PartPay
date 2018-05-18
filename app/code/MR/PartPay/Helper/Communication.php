@@ -94,7 +94,7 @@ class Communication extends AbstractHelper
 
             try {
                 $accessTokenResult = $this->_sendRequest($url, $headers, [], \Magento\Framework\HTTP\ZendClient::POST, json_encode($accessTokenParam));
-                $response = json_decode($accessTokenResult, true);
+                $response = json_decode($accessTokenResult['response'], true);
             } catch (\Exception $ex) {
                 $this->_logger->error($ex->getMessage());
                 return false;

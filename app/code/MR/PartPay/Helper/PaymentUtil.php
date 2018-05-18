@@ -43,7 +43,6 @@ class PaymentUtil extends AbstractHelper
     {
         $this->_logger->info(__METHOD__ . " responseText:{$responseText}");
         $info = [
-            "PartPayID" => $partpayId,
             "Error" => $responseText,
         ];
         $payment->setAdditionalInformation(date("Y-m-d H:i:s"), json_encode($info));
@@ -51,16 +50,17 @@ class PaymentUtil extends AbstractHelper
         return $info;
     }
 
-    public function savePartPayRefundResponse($payment, $partpayId, $responseBody)
+    public function savePartPayRefundResponse($payment, $responseBody)
     {
         $this->_logger->info(__METHOD__ . " responseBody:{$responseBody}");
-        $info = [
-            'OrderRefunded' => $partpayId,
-        ];
-        $payment->setAdditionalInformation(date("Y-m-d H:i:s"), json_encode($info));
+        $response = json_decode($responseBody, true);
+        if (isset($response['id'])) {
+            $payment->setTransactionId($response['id']);
+        }
+        $payment->setAdditionalInformation(date("Y-m-d H:i:s"), $responseBody);
         $payment->save();
 
-        return $info;
+        return $response;
     }
 
     public function loadOrderById($orderId)

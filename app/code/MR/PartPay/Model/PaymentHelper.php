@@ -85,6 +85,10 @@ class PaymentHelper
         $transactionId = $info["orderId"]; // ensure it is unique
         $payment->setTransactionId($transactionId);
         $payment->setIsTransactionClosed(1);
+        unset($info['items']);
+        unset($info['billing']);
+        unset($info['shipping']);
+        unset($info['merchant']);
         $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $info);
     }
     

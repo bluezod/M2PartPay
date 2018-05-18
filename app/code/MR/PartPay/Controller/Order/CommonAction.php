@@ -280,32 +280,6 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         return $info;
     }
 
-    private function _savePaymentResult($pxpayUserId, $token, \Magento\Quote\Model\Quote $quote, 
-        $paymentResponseXmlElement)
-    {
-        $this->_logger->info(__METHOD__ . " username:{$pxpayUserId}, token:{$token}");
-        $payment = $quote->getPayment();
-        $method = $payment->getMethod();
-        
-        $paymentResultModel = $this->_objectManager->create("\MR\PartPay\Model\PaymentResult");
-        $paymentResultModel->setData(
-            array(
-                "dps_transaction_type" => (string)$paymentResponseXmlElement->TxnType,
-                "dps_txn_ref" => (string)$paymentResponseXmlElement->DpsTxnRef,
-                "method" => $method,
-                "user_name" => $pxpayUserId,
-                "token" => $token,
-                "quote_id" => $quote->getId(),
-                "reserved_order_id" => (string)$paymentResponseXmlElement->MerchantReference,
-                "updated_time" => new \DateTime(),
-                "raw_xml" => (string)$paymentResponseXmlElement->asXML()
-            ));
-        
-        $paymentResultModel->save();
-        
-        $this->_logger->info(__METHOD__ . " done");
-    }
-
     private function _getTransactionStatus($partpayId)
     {
         try{

@@ -17,13 +17,6 @@ class GuestPartPayManagement implements \MR\PartPay\Api\GuestPartPayManagementIn
      */
     private $_logger;
 
-
-    /**
-     *
-     * @var \MR\PartPay\Helper\PartPay\UrlCreator
-     */
-    private $_pxpayUrlCreator;
-
     /**
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
@@ -65,7 +58,7 @@ class GuestPartPayManagement implements \MR\PartPay\Api\GuestPartPayManagementIn
     		\Magento\Quote\Api\Data\AddressInterface $billingAddress = null
     ) {
         $this->_logger->info(__METHOD__. " cartId:{$cartId} guestEmail:{$email}");
-        // Create pxpay redirect url.
+        // Create partpay redirect url.
         
         if ($billingAddress) {
         	$this->_logger->info(__METHOD__. " assigning billing address.");

@@ -11,7 +11,7 @@ define(
         'Magento_Checkout/js/model/quote',
     ],
     function ($, ko, Component, setPaymentMethodAction, additionalValidators, customer, quote) {
-        var partpayConfig = window.checkoutConfig.payment.paymentexpress;
+        var partpayConfig = window.checkoutConfig.payment.partpay;
         
         return Component.extend(
             {

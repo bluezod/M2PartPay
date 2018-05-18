@@ -152,7 +152,6 @@ abstract class CommonAction extends \Magento\Framework\App\Action\Action
         if (!$response) {
             return;
         }
-
         /**
          * @var \Magento\Quote\Model\Quote $quote
          */

@@ -39,7 +39,7 @@ class PaymentUtil extends AbstractHelper
         return $url;
     }
 
-    public function saveInvalidResponse($payment, $partpayId, $responseText)
+    public function saveInvalidRefundResponse($payment, $responseText)
     {
         $this->_logger->info(__METHOD__ . " responseText:{$responseText}");
         $info = [

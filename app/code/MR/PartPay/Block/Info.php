@@ -34,13 +34,14 @@ class Info extends \Magento\Payment\Block\Info
             if (in_array($key, ['items', 'billing', 'shipping', 'merchant'])) {
                 continue;
             }
-        	if (strtotime($key)) {
+            if (strtotime($key)) {
                 $decodedValue = json_decode($value, true);
-                // TODO: deprecate unserialize completely
-                if (json_last_error() != JSON_ERROR_NONE)
-                    $decodedValue = unserialize($value);
-        		$decodedData[$key] = $decodedValue;
-        	}
+                if (!$decodedValue) {
+                    $decodedData[$key] = $this->getValueAsArray($value, true);
+                } else {
+                    $decodedData[$key] = $decodedValue;
+                }
+            }
         	else {
         		$decodedData[$key] = $value;
         	}

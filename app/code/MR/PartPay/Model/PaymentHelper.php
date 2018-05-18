@@ -112,11 +112,11 @@ class PaymentHelper
         $response = $apiResult['response'];
         if ($apiResult['errmsg']) {
             $errorMessage = " Failed to refund order:{$orderId}, {$apiResult['errmsg']}, response from PartPay: " . $response;
-            $this->_paymentUtil->saveInvalidResponse($payment, $partpayId, $errorMessage);
+            $this->_paymentUtil->saveInvalidRefundResponse($payment, $errorMessage);
             $this->_logger->critical(__METHOD__ . $errorMessage);
             throw new \Magento\Framework\Exception\PaymentException(__($errorMessage));
         }
     
-        $this->_paymentUtil->savePartPayRefundResponse($payment, $partpayId, $response);
+        $this->_paymentUtil->savePartPayRefundResponse($payment, $response);
     }
 }
